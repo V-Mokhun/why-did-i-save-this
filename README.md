@@ -1,18 +1,4 @@
-<div align="center">
-<img src="public/icon-128.png" alt="logo"/>
-<h1> Minimalist Chrome/Firefox Extension Boilerplate with<br/>React + Vite + TypeScript + TailwindCSS</h1>
-
-<h5>
-This template repository is a side product of my Chrome Extension <a target="_blank" rel="noopener noreferrer" href="https://chrome.google.com/webstore/detail/supatabs/icbcnjlaegndjabnjbaeihnnmidbfigk">Supatabs</a>.
-<br />
-If you tend to have tons of tabs open, or are a OneTab user, make sure to check it out <a target="_blank" rel="noopener noreferrer" href="https://chrome.google.com/webstore/detail/supatabs/icbcnjlaegndjabnjbaeihnnmidbfigk">here</a>!
-</h5>
-
-<h5>Supatabs is an example and showcase of what you can develop with this template. (anything you want, really 🚀)</h5>
-
-</div>
-
-## Table of Contents
+# Table of Contents
 
 - [Intro](#intro)
 - [Features](#features)
@@ -32,9 +18,6 @@ It includes all possible pages such as **new tab**, **dev panel**, **pop up**, e
 You will likely have to customize/delete some of the pages (see docs below).
 
 You can build dist files for both Chrome and Firefox with manifest v3.
-
-If you are looking for a React focused way to access the local storage, I also implemented a chrome local/sync storage hook. The hook works
-well with this template. [Check it out here](https://gist.github.com/JohnBra/c81451ea7bc9e77f8021beb4f198ab96).
 
 ## Features <a name="features"></a>
 - [React 19](https://reactjs.org/)
@@ -176,6 +159,3 @@ To run the workflow do the following:
 - [@crxjs/vite-plugin](https://crxjs.dev/vite-plugin)
 - [Rollup](https://rollupjs.org/guide/en/)
 - [Tailwind CSS 4](https://tailwindcss.com/docs/configuration)
-
-# Contributing <a name="contributing"></a>
-Feel free to open PRs or raise issues!
