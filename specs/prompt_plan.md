@@ -33,7 +33,7 @@ Integrate a categorization system into the extension:
 
 - Update the UI in popup.html to allow users to create new categories and assign colors/icons to them.
 - Modify the data model to allow each saved link to be assigned to one or more categories.
-- In popup.js, implement functions to manage category creation, assignment, and listing.
+- In popup, implement functions to manage category creation, assignment, and listing.
 - Update the popup UI to display saved links organized by category (e.g., in separate sections for each category).
   Make sure that the categorization system is fully integrated and updates in real time when links or categories change.
 

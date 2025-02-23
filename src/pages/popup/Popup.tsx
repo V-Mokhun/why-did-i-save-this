@@ -1,14 +1,17 @@
+import { CategoryManager } from "@/components/popup/category-manager";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { useLinks, useCategories } from "@/lib/hooks";
+import { Category, SavedLink } from "@/lib/types";
 import logo from "@assets/img/logo.svg";
-import { SavedLink, useLinks } from "@/lib/hooks";
+import { ConfirmDialog } from "@components/confirm-dialog";
+import { PencilIcon, XIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import browser from "webextension-polyfill";
-import { ConfirmDialog } from "@components/confirm-dialog";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { PencilIcon, CheckIcon, XIcon } from "lucide-react";
+import { CategorySelector } from "@/components/popup/category-selector";
 
 export default function Popup() {
   const [note, setNote] = useState("");
@@ -23,6 +26,9 @@ export default function Popup() {
   const { saveLink } = useLinks();
   const [showConfirm, setShowConfirm] = useState(false);
   const [pendingSave, setPendingSave] = useState<SavedLink | null>(null);
+  const { saveCategory, getAllCategories } = useCategories();
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
     const getCurrentTab = async () => {
@@ -44,6 +50,14 @@ export default function Popup() {
     getCurrentTab();
   }, []);
 
+  useEffect(() => {
+    const loadCategories = async () => {
+      const loadedCategories = await getAllCategories();
+      setCategories(loadedCategories);
+    };
+    loadCategories();
+  }, [getAllCategories]);
+
   const handleSave = async () => {
     if (!currentTab) return;
 
@@ -52,7 +66,11 @@ export default function Popup() {
         url: isEditing ? editedUrl : currentTab.url,
         title: isEditing ? editedTitle : currentTab.title,
         note,
-        tags: tags.split(",").map((tag) => tag.trim()).filter(Boolean),
+        tags: tags
+          .split(",")
+          .map((tag) => tag.trim())
+          .filter(Boolean),
+        categories: selectedCategories,
         timestamp: Date.now(),
       };
 
@@ -67,6 +85,7 @@ export default function Popup() {
       if (success) {
         setNote("");
         setTags("");
+        setSelectedCategories([]);
         setIsEditing(false);
       }
     } catch (error) {
@@ -97,6 +116,11 @@ export default function Popup() {
     setIsEditing(!isEditing);
   };
 
+  const handleSaveCategory = async (category: Category) => {
+    const categories = await saveCategory(category);
+    setCategories(categories);
+  };
+
   return (
     <Card className="w-[350px] border-0 bg-gray-800">
       <CardHeader className="flex-row items-center justify-between space-y-0 pb-2">
@@ -104,16 +128,23 @@ export default function Popup() {
           <img src={logo} className="h-6 w-6" alt="logo" />
           <h1 className="text-lg font-semibold text-white">Quick Notes</h1>
         </div>
-        {currentTab && (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 text-gray-400 hover:text-white"
-            onClick={handleEditToggle}
-          >
-            {isEditing ? <XIcon className="h-4 w-4" /> : <PencilIcon className="h-4 w-4" />}
-          </Button>
-        )}
+        <div className="flex items-center gap-2">
+          <CategoryManager onSaveCategory={handleSaveCategory} />
+          {currentTab && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-gray-400 hover:text-white"
+              onClick={handleEditToggle}
+            >
+              {isEditing ? (
+                <XIcon className="h-4 w-4" />
+              ) : (
+                <PencilIcon className="h-4 w-4" />
+              )}
+            </Button>
+          )}
+        </div>
       </CardHeader>
 
       <CardContent className="space-y-4">
@@ -128,7 +159,9 @@ export default function Popup() {
                   className="bg-gray-700 border-0 text-white"
                 />
               ) : (
-                <p className="text-sm font-medium text-white">{currentTab.title}</p>
+                <p className="text-sm font-medium text-white">
+                  {currentTab.title}
+                </p>
               )}
             </div>
             <div className="space-y-1">
@@ -140,11 +173,22 @@ export default function Popup() {
                   className="bg-gray-700 border-0 text-white"
                 />
               ) : (
-                <p className="text-sm text-gray-400 truncate">{currentTab.url}</p>
+                <p className="text-sm text-gray-400 truncate">
+                  {currentTab.url}
+                </p>
               )}
             </div>
           </div>
         )}
+
+        <div className="space-y-1">
+          <Label className="text-xs text-gray-400">Categories</Label>
+          <CategorySelector
+            categories={categories}
+            selectedCategories={selectedCategories}
+            onSelect={setSelectedCategories}
+          />
+        </div>
 
         <div className="space-y-1">
           <Label className="text-xs text-gray-400">Note</Label>
@@ -152,7 +196,7 @@ export default function Popup() {
             placeholder="Write your note here..."
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            className="min-h-[100px] bg-gray-700 border-0 text-white resize-none"
+            className="min-h-20 bg-gray-700 border-0 text-white resize-none"
           />
         </div>
 

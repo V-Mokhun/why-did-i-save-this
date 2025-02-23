@@ -1,13 +1,6 @@
 import { useCallback } from "react";
 import browser from "webextension-polyfill";
-
-export interface SavedLink {
-  url: string;
-  title: string;
-  note: string;
-  timestamp: number;
-  tags?: string[];
-}
+import { SavedLink } from "../types";
 
 const STORAGE_KEY = "saved_links";
 
@@ -41,7 +34,7 @@ export function useLinks() {
 
         if (existingIndex !== -1) {
           console.log("Found duplicate at index:", existingIndex);
-          
+
           if (onDuplicateFound) {
             const shouldUpdate = await onDuplicateFound();
             if (!shouldUpdate) {
