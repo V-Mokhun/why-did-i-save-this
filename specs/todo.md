@@ -52,17 +52,17 @@ This checklist outlines every step required to build the "Why Did I Save This?" 
 
 ---
 
-## 4. Categorization & Organization
-- [ ] **UI Enhancements**
-  - [ ] Update `popup.tsx` to allow users to create new categories.
-  - [ ] Enable assigning colors/icons (including emoji support) to categories.
-- [ ] **Data Model Updates**
-  - [ ] Modify the saved link data model to include one or more categories.
-- [ ] **Category Management**
-  - [ ] Implement functions to add, edit, and manage categories.
-- [ ] **Display Organization**
-  - [ ] Organize and display saved links by category in the popup.
-  - [ ] Ensure real-time UI updates when links or categories change.
+## 4. Categorization & Organization ✅
+- [x] **UI Enhancements**
+  - [x] Update `popup.tsx` to allow users to create new categories.
+  - [x] Enable assigning colors/icons (including emoji support) to categories.
+- [x] **Data Model Updates**
+  - [x] Modify the saved link data model to include one or more categories.
+- [x] **Category Management**
+  - [x] Implement functions to add, edit, and manage categories.
+- [x] **Display Organization**
+  - [x] Organize and display saved links by category in the popup.
+  - [x] Ensure real-time UI updates when links or categories change.
 
 ---
 
