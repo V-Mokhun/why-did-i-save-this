@@ -23,41 +23,26 @@ export function useLinks() {
       onDuplicateFound?: () => Promise<boolean>
     ): Promise<boolean> => {
       try {
-        console.group("Saving Link");
-        console.log("Attempting to save:", note);
-
         const links = await getAllLinks();
         const existingIndex = links.findIndex((link) => link.url === note.url);
 
-        console.log("Existing links:", links);
-        console.log("Duplicate found:", existingIndex !== -1);
-
         if (existingIndex !== -1) {
-          console.log("Found duplicate at index:", existingIndex);
-
           if (onDuplicateFound) {
             const shouldUpdate = await onDuplicateFound();
             if (!shouldUpdate) {
-              console.log("User cancelled update");
-              console.groupEnd();
               return false;
             }
           }
 
-          console.log("Updating existing note");
           links[existingIndex] = note;
         } else {
-          console.log("Adding new note");
           links.push(note);
         }
 
         await browser.storage.local.set({ [STORAGE_KEY]: links });
-        console.log("Successfully saved to storage");
-        console.groupEnd();
         return true;
       } catch (error) {
         console.error("Error saving link:", error);
-        console.groupEnd();
         return false;
       }
     },

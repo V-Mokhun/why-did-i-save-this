@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import * as React from "react";
 import { Check, ChevronsUpDown, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -29,7 +29,7 @@ export function CategorySelector({
   selectedCategories,
   onSelect,
 }: CategorySelectorProps) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = React.useState(false);
 
   const toggleCategory = (categoryId: string) => {
     const newSelection = selectedCategories.includes(categoryId)
@@ -54,7 +54,7 @@ export function CategorySelector({
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="w-full justify-between bg-gray-700 border-0 text-white hover:bg-gray-600"
+            className="w-full justify-between"
           >
             <span className="truncate">
               {selectedCategories.length === 0
@@ -64,26 +64,17 @@ export function CategorySelector({
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-full p-0 bg-gray-700 border-gray-600">
-          <Command className="bg-transparent">
-            <CommandInput
-              placeholder="Search categories..."
-              className="text-white"
-            />
+        <PopoverContent className="w-full p-0">
+          <Command>
+            <CommandInput placeholder="Search categories..." />
             <CommandList>
-              <CommandEmpty className="text-gray-400 p-2">
-                No categories found.
-              </CommandEmpty>
-              <CommandGroup className="max-h-[200px] overflow-auto">
+              <CommandEmpty>No categories found.</CommandEmpty>
+              <CommandGroup>
                 {categories.map((category) => (
                   <CommandItem
                     key={category.id}
                     value={category.name}
                     onSelect={() => toggleCategory(category.id)}
-                    className={cn(
-                      "text-white hover:bg-gray-600 relative",
-                      category.color && "hover:bg-opacity-90"
-                    )}
                   >
                     <Check
                       className={cn(
@@ -96,10 +87,10 @@ export function CategorySelector({
                     {category.icon && (
                       <span className="mr-2">{getCategoryIcon(category)}</span>
                     )}
-                    {category.name}
+                    <span>{category.name}</span>
                     {category.color && (
                       <div
-                        className="absolute bottom-0 left-8 right-4 h-0.5 opacity-50"
+                        className="ml-auto w-3 h-3 rounded-full opacity-50"
                         style={{ backgroundColor: category.color }}
                       />
                     )}
@@ -110,6 +101,7 @@ export function CategorySelector({
           </Command>
         </PopoverContent>
       </Popover>
+
       {selectedCategories.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {selectedCategories.map((categoryId) => {
@@ -118,22 +110,14 @@ export function CategorySelector({
             return (
               <div
                 key={category.id}
-                className="group flex items-center gap-1.5 relative cursor-pointer py-0.5"
+                className="flex items-center gap-1.5 cursor-pointer"
                 onClick={() => toggleCategory(category.id)}
               >
                 {category.icon && (
-                  <span className="text-gray-300">
-                    {getCategoryIcon(category)}
-                  </span>
+                  <span>{getCategoryIcon(category)}</span>
                 )}
-                <span className="text-sm text-gray-300">{category.name}</span>
-                {category.color && (
-                  <div
-                    className="absolute bottom-0 left-0 right-0 h-0.5 opacity-50 group-hover:opacity-100 transition-opacity"
-                    style={{ backgroundColor: category.color }}
-                  />
-                )}
-                <X className="h-3 w-3 text-gray-400 hover:text-gray-300 transition-colors" />
+                <span className="text-sm">{category.name}</span>
+                <X className="h-3 w-3" />
               </div>
             );
           })}

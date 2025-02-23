@@ -1,33 +1,42 @@
+import { Button } from "./ui/button";
+import {
+  Dialog,
+  DialogTitle,
+  DialogHeader,
+  DialogContent,
+  DialogFooter,
+} from "./ui/dialog";
+
 interface ConfirmDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   message: string;
   onConfirm: () => void;
   onCancel: () => void;
 }
 
 export function ConfirmDialog({
+  onOpenChange,
+  open,
   message,
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
   return (
-    <div className="absolute inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <div className="bg-gray-700 rounded-lg p-4 max-w-sm w-full shadow-lg">
-        <p className="text-white mb-4">{message}</p>
-        <div className="flex gap-2 justify-end">
-          <button
-            onClick={onCancel}
-            className="px-3 py-1.5 text-sm text-gray-300 hover:text-white transition-colors"
-          >
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{message}</DialogTitle>
+        </DialogHeader>
+        <DialogFooter>
+          <Button variant="outline" onClick={onCancel}>
             Cancel
-          </button>
-          <button
-            onClick={onConfirm}
-            className="px-3 py-1.5 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-          >
+          </Button>
+          <Button variant="default" onClick={onConfirm}>
             Update
-          </button>
-        </div>
-      </div>
-    </div>
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

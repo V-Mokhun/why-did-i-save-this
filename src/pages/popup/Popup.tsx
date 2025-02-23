@@ -20,7 +20,6 @@ export default function Popup() {
     url: string;
     title: string;
   } | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState("");
   const [editedUrl, setEditedUrl] = useState("");
   const { saveLink } = useLinks();
@@ -63,8 +62,8 @@ export default function Popup() {
 
     try {
       const noteData: SavedLink = {
-        url: isEditing ? editedUrl : currentTab.url,
-        title: isEditing ? editedTitle : currentTab.title,
+        url: editedUrl,
+        title: editedTitle,
         note,
         tags: tags
           .split(",")
@@ -86,7 +85,6 @@ export default function Popup() {
         setNote("");
         setTags("");
         setSelectedCategories([]);
-        setIsEditing(false);
       }
     } catch (error) {
       console.error("Error in save handler:", error);
@@ -105,45 +103,20 @@ export default function Popup() {
     setPendingSave(null);
   };
 
-  const handleEditToggle = () => {
-    if (isEditing) {
-      // Cancel editing - reset to original values
-      if (currentTab) {
-        setEditedTitle(currentTab.title);
-        setEditedUrl(currentTab.url);
-      }
-    }
-    setIsEditing(!isEditing);
-  };
-
   const handleSaveCategory = async (category: Category) => {
     const categories = await saveCategory(category);
     setCategories(categories);
   };
 
   return (
-    <Card className="w-[350px] border-0 bg-gray-800">
+    <Card className="w-[350px]">
       <CardHeader className="flex-row items-center justify-between space-y-0 pb-2">
         <div className="flex items-center gap-2">
           <img src={logo} className="h-6 w-6" alt="logo" />
-          <h1 className="text-lg font-semibold text-white">Quick Notes</h1>
+          <h1 className="text-lg font-semibold">Quick Notes</h1>
         </div>
         <div className="flex items-center gap-2">
           <CategoryManager onSaveCategory={handleSaveCategory} />
-          {currentTab && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 text-gray-400 hover:text-white"
-              onClick={handleEditToggle}
-            >
-              {isEditing ? (
-                <XIcon className="h-4 w-4" />
-              ) : (
-                <PencilIcon className="h-4 w-4" />
-              )}
-            </Button>
-          )}
         </div>
       </CardHeader>
 
@@ -151,38 +124,24 @@ export default function Popup() {
         {currentTab && (
           <div className="space-y-2">
             <div className="space-y-1">
-              <Label className="text-xs text-gray-400">Title</Label>
-              {isEditing ? (
-                <Input
-                  value={editedTitle}
-                  onChange={(e) => setEditedTitle(e.target.value)}
-                  className="bg-gray-700 border-0 text-white"
-                />
-              ) : (
-                <p className="text-sm font-medium text-white">
-                  {currentTab.title}
-                </p>
-              )}
+              <Label>Title</Label>
+              <Input
+                value={editedTitle}
+                onChange={(e) => setEditedTitle(e.target.value)}
+              />
             </div>
             <div className="space-y-1">
-              <Label className="text-xs text-gray-400">URL</Label>
-              {isEditing ? (
-                <Input
-                  value={editedUrl}
-                  onChange={(e) => setEditedUrl(e.target.value)}
-                  className="bg-gray-700 border-0 text-white"
-                />
-              ) : (
-                <p className="text-sm text-gray-400 truncate">
-                  {currentTab.url}
-                </p>
-              )}
+              <Label>URL</Label>
+              <Input
+                value={editedUrl}
+                onChange={(e) => setEditedUrl(e.target.value)}
+              />
             </div>
           </div>
         )}
 
         <div className="space-y-1">
-          <Label className="text-xs text-gray-400">Categories</Label>
+          <Label>Categories</Label>
           <CategorySelector
             categories={categories}
             selectedCategories={selectedCategories}
@@ -191,22 +150,21 @@ export default function Popup() {
         </div>
 
         <div className="space-y-1">
-          <Label className="text-xs text-gray-400">Note</Label>
+          <Label>Note</Label>
           <Textarea
             placeholder="Write your note here..."
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            className="min-h-20 bg-gray-700 border-0 text-white resize-none"
+            className="min-h-20 resize-none"
           />
         </div>
 
         <div className="space-y-1">
-          <Label className="text-xs text-gray-400">Tags</Label>
+          <Label>Tags</Label>
           <Input
             placeholder="Add tags (comma-separated)"
             value={tags}
             onChange={(e) => setTags(e.target.value)}
-            className="bg-gray-700 border-0 text-white"
           />
         </div>
 
@@ -221,6 +179,8 @@ export default function Popup() {
 
       {showConfirm && (
         <ConfirmDialog
+          open={showConfirm}
+          onOpenChange={setShowConfirm}
           message="This URL already exists. Would you like to update the existing note?"
           onConfirm={handleConfirm}
           onCancel={handleCancel}

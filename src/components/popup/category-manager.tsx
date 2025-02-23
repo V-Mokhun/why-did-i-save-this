@@ -80,45 +80,39 @@ export function CategoryManager({ onSaveCategory }: CategoryManagerProps) {
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          size="sm"
-          className="text-gray-400 hover:text-white bg-gray-700 border-0"
-        >
+        <Button variant="outline" size="sm">
           <Plus className="h-4 w-4 mr-1" />
           Add Category
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80 bg-gray-700 border-gray-600">
+      <PopoverContent className="w-80">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label className="text-xs text-gray-400">Category Name</Label>
+            <Label>Category Name</Label>
             <Input
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Enter category name"
-              className="bg-gray-600 border-0 text-white"
             />
           </div>
 
           <div className="space-y-2">
-            <Label className="text-xs text-gray-400">Icon (Optional)</Label>
+            <Label>Icon (Optional)</Label>
             <Input
               type="text"
               placeholder="Search icons..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-gray-600 border-0 text-white mb-2"
             />
             <div className="grid grid-cols-6 gap-2 max-h-[200px] overflow-y-auto p-1">
               <button
                 type="button"
-                className={`aspect-square rounded flex items-center justify-center bg-gray-600 ${
-                  !icon ? "ring-2 ring-white" : ""
+                className={`aspect-square rounded flex items-center justify-center ${
+                  !icon ? "ring-2" : ""
                 }`}
                 onClick={() => setIcon(undefined)}
               >
-                <X className="h-4 w-4 text-white" />
+                <X className="h-4 w-4" />
               </button>
               {filteredIcons.map((iconName) => {
                 const Icon = Icons[
@@ -129,12 +123,12 @@ export function CategoryManager({ onSaveCategory }: CategoryManagerProps) {
                     key={iconName}
                     type="button"
                     onClick={() => setIcon(iconName)}
-                    className={`aspect-square rounded flex flex-col items-center justify-center p-1 hover:bg-gray-600 ${
-                      icon === iconName ? "ring-2 ring-white bg-gray-600" : ""
+                    className={`aspect-square rounded flex flex-col items-center justify-center p-1 ${
+                      icon === iconName ? "ring-2" : ""
                     }`}
                     title={iconName}
                   >
-                    <Icon className="h-4 w-4 text-white" />
+                    <Icon className="h-4 w-4" />
                   </button>
                 );
               })}
@@ -142,23 +136,23 @@ export function CategoryManager({ onSaveCategory }: CategoryManagerProps) {
           </div>
 
           <div className="space-y-2">
-            <Label className="text-xs text-gray-400">Color (Optional)</Label>
+            <Label>Color (Optional)</Label>
             <div className="grid grid-cols-6 gap-2">
               <button
                 type="button"
-                className={`w-6 h-6 rounded-full bg-gray-500 flex items-center justify-center ${
-                  !color ? "ring-2 ring-white" : ""
+                className={`w-6 h-6 rounded-full flex items-center justify-center ${
+                  !color ? "ring-2" : ""
                 }`}
                 onClick={() => setColor(undefined)}
               >
-                <X className="h-4 w-4 text-white" />
+                <X className="h-4 w-4" />
               </button>
               {PRESET_COLORS.map((presetColor) => (
                 <button
                   key={presetColor}
                   type="button"
                   className={`w-6 h-6 rounded-full ${
-                    color === presetColor ? "ring-2 ring-white" : ""
+                    color === presetColor ? "ring-2" : ""
                   }`}
                   style={{ backgroundColor: presetColor }}
                   onClick={() => setColor(presetColor)}
