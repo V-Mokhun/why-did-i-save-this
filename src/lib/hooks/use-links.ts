@@ -71,10 +71,71 @@ export function useLinks() {
     [links, setLinks]
   );
 
+  const moveToTrash = useCallback(
+    async (url: string): Promise<boolean> => {
+      try {
+        const linkIndex = links.findIndex((link) => link.url === url);
+        if (linkIndex === -1) return false;
+
+        const updatedLinks = [...links];
+        updatedLinks[linkIndex] = {
+          ...links[linkIndex],
+          isDeleted: true,
+          deletedAt: Date.now(),
+          isPinned: false,
+        };
+
+        setLinks(updatedLinks);
+        return true;
+      } catch (error) {
+        console.error("Error moving link to trash:", error);
+        return false;
+      }
+    },
+    [links, setLinks]
+  );
+
+  const restoreFromTrash = useCallback(
+    async (url: string): Promise<boolean> => {
+      try {
+        const linkIndex = links.findIndex((link) => link.url === url);
+        if (linkIndex === -1) return false;
+
+        const updatedLinks = [...links];
+        updatedLinks[linkIndex] = {
+          ...links[linkIndex],
+          isDeleted: false,
+          deletedAt: undefined,
+        };
+
+        setLinks(updatedLinks);
+        return true;
+      } catch (error) {
+        console.error("Error restoring link from trash:", error);
+        return false;
+      }
+    },
+    [links, setLinks]
+  );
+
+  const emptyTrash = useCallback(async (): Promise<boolean> => {
+    try {
+      setLinks(links.filter(link => !link.isDeleted));
+      return true;
+    } catch (error) {
+      console.error("Error emptying trash:", error);
+      return false;
+    }
+  }, [links, setLinks]);
+
   return {
-    links,
+    links: links.filter((link) => !link.isDeleted),
+    trashedLinks: links.filter((link) => link.isDeleted),
     saveLink,
     deleteLink,
     updateLink,
+    moveToTrash,
+    restoreFromTrash,
+    emptyTrash,
   };
 }

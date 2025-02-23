@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { HomeHeader } from "./home-header";
 import { QuickFilter, QuickFilterTabs } from "./quick-filter-tabs";
-import { CategoryChips } from "./category-chips";
+import { CategoryChips } from "../../category-chips";
 import { useCategories, useLinks } from "@/lib/hooks";
 import { LinkList } from "./link-list";
 

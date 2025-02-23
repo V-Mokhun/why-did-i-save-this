@@ -5,6 +5,7 @@ import { QuickFilter } from "./quick-filter-tabs";
 import { useLinks } from "@/lib/hooks";
 import { useState } from "react";
 import { SaveLinkView } from "../save-link";
+import { toast } from "sonner";
 
 interface LinkListProps {
   links: SavedLink[];
@@ -21,7 +22,7 @@ export const LinkList = ({
   selectedFilter,
   selectedCategories,
 }: LinkListProps) => {
-  const { updateLink, deleteLink } = useLinks();
+  const { updateLink, moveToTrash, restoreFromTrash } = useLinks();
   const [editingLink, setEditingLink] = useState<SavedLink | null>(null);
 
   const handlePin = async (link: SavedLink) => {
@@ -33,8 +34,13 @@ export const LinkList = ({
   };
 
   const handleDelete = async (link: SavedLink) => {
-    //TODO: Implement soft delete
-    await deleteLink(link.url);
+    await moveToTrash(link.url);
+    toast.success("Link moved to trash", {
+      action: {
+        label: "Undo",
+        onClick: () => restoreFromTrash(link.url),
+      },
+    });
   };
 
   const handleOpen = async (link: SavedLink) => {
