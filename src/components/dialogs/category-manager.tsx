@@ -16,7 +16,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useCategories } from "@/lib/hooks";
 
 interface CategoryManagerProps {
-  categoryToEdit?: Category;
+  categoryToEdit?: Category | null;
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
   onSaveCategory: (category: Category) => void;

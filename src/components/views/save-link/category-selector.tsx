@@ -33,6 +33,7 @@ export function CategorySelector({
 }: CategorySelectorProps) {
   const [open, setOpen] = useState(false);
   const [showCategoryManager, setShowCategoryManager] = useState(false);
+  const [categoryToEdit, setCategoryToEdit] = useState<Category | null>(null);
   const { saveCategory } = useCategories();
 
   const toggleCategory = (categoryId: string) => {
@@ -70,9 +71,11 @@ export function CategorySelector({
                   isOpen={showCategoryManager}
                   setIsOpen={setShowCategoryManager}
                   onSaveCategory={saveCategory}
+                  categoryToEdit={categoryToEdit}
                   trigger={
                     <CommandItem
                       onSelect={() => {
+                        setCategoryToEdit(null);
                         setShowCategoryManager(true);
                       }}
                       className="flex items-center gap-2 cursor-pointer"
@@ -97,7 +100,7 @@ export function CategorySelector({
                       <CommandItem
                         key={category.id}
                         onSelect={() => toggleCategory(category.id)}
-                        className="flex items-center gap-2 cursor-pointer"
+                        className="flex items-center gap-2 cursor-pointer group"
                       >
                         <div
                           className={`flex items-center justify-center w-4 h-4 rounded ${
@@ -107,9 +110,7 @@ export function CategorySelector({
                           }`}
                         >
                           {selectedCategories.includes(category.id) && (
-                            <span className="text-primary-foreground text-xs">
-                              ✓
-                            </span>
+                            <Icons.Check className="h-2 w-2 text-primary-foreground" />
                           )}
                         </div>
                         {IconComponent && (
@@ -123,6 +124,16 @@ export function CategorySelector({
                           />
                         )}
                         {category.name}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setCategoryToEdit(category);
+                            setShowCategoryManager(true);
+                          }}
+                          className="ml-auto opacity-0 group-hover:opacity-100 w-4 h-4 border border-accent hover:bg-accent rounded flex items-center justify-center"
+                        >
+                          <Icons.Pencil className="h-2 w-2" />
+                        </button>
                       </CommandItem>
                     );
                   })
