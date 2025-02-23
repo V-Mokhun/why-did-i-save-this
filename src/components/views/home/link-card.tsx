@@ -10,6 +10,7 @@ interface LinkCardProps {
   onPin: (link: SavedLink) => void;
   onEdit: (link: SavedLink) => void;
   onDelete: (link: SavedLink) => void;
+  onOpen: () => void;
 }
 
 export const LinkCard = ({
@@ -18,12 +19,14 @@ export const LinkCard = ({
   onPin,
   onEdit,
   onDelete,
+  onOpen,
 }: LinkCardProps) => {
   const linkCategories = categories.filter((category) =>
     link.categories?.includes(category.id)
   );
 
   const handleOpen = async () => {
+    onOpen();
     await browser.tabs.create({ url: link.url });
   };
 
