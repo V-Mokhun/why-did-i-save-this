@@ -1,6 +1,3 @@
-import * as React from "react";
-import { Check, ChevronsUpDown, X } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -9,6 +6,7 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
+  CommandSeparator,
 } from "@/components/ui/command";
 import {
   Popover,
@@ -17,11 +15,15 @@ import {
 } from "@/components/ui/popover";
 import { Category } from "@/lib/types";
 import * as Icons from "lucide-react";
+import { ChevronsUpDown, Plus, X } from "lucide-react";
+import { useState } from "react";
+import { CategoryManager } from "./category-manager";
+import { useCategories } from "@/lib/hooks";
 
 interface CategorySelectorProps {
   categories: Category[];
   selectedCategories: string[];
-  onSelect: (categoryIds: string[]) => void;
+  onSelect: (categories: string[]) => void;
 }
 
 export function CategorySelector({
@@ -29,21 +31,16 @@ export function CategorySelector({
   selectedCategories,
   onSelect,
 }: CategorySelectorProps) {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
+  const [showCategoryManager, setShowCategoryManager] = useState(false);
+  const { saveCategory } = useCategories();
 
   const toggleCategory = (categoryId: string) => {
-    const newSelection = selectedCategories.includes(categoryId)
-      ? selectedCategories.filter((id) => id !== categoryId)
-      : [...selectedCategories, categoryId];
-    onSelect(newSelection);
-  };
-
-  const getCategoryIcon = (category: Category) => {
-    if (!category.icon) return null;
-    const IconComponent = Icons[
-      category.icon as keyof typeof Icons
-    ] as React.ElementType;
-    return <IconComponent className="h-4 w-4" />;
+    onSelect(
+      selectedCategories.includes(categoryId)
+        ? selectedCategories.filter((id) => id !== categoryId)
+        : [...selectedCategories, categoryId]
+    );
   };
 
   return (
@@ -65,37 +62,71 @@ export function CategorySelector({
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-full p-0">
-          <Command>
+          <Command className="rounded-lg border shadow-md">
             <CommandInput placeholder="Search categories..." />
-            <CommandList>
-              <CommandEmpty>No categories found.</CommandEmpty>
+            <CommandList className="max-h-[200px]">
               <CommandGroup>
-                {categories.map((category) => (
-                  <CommandItem
-                    key={category.id}
-                    value={category.name}
-                    onSelect={() => toggleCategory(category.id)}
-                  >
-                    <Check
-                      className={cn(
-                        "mr-2 h-4 w-4",
-                        selectedCategories.includes(category.id)
-                          ? "opacity-100"
-                          : "opacity-0"
-                      )}
-                    />
-                    {category.icon && (
-                      <span className="mr-2">{getCategoryIcon(category)}</span>
-                    )}
-                    <span>{category.name}</span>
-                    {category.color && (
-                      <div
-                        className="ml-auto w-3 h-3 rounded-full opacity-50"
-                        style={{ backgroundColor: category.color }}
-                      />
-                    )}
-                  </CommandItem>
-                ))}
+                <CategoryManager
+                  isOpen={showCategoryManager}
+                  setIsOpen={setShowCategoryManager}
+                  onSaveCategory={saveCategory}
+                  trigger={
+                    <CommandItem
+                      onSelect={() => {
+                        setShowCategoryManager(true);
+                      }}
+                      className="flex items-center gap-2 cursor-pointer"
+                    >
+                      <Plus className="h-4 w-4" />
+                      Create new category
+                    </CommandItem>
+                  }
+                />
+                <CommandSeparator className="my-1" />
+                {categories.length === 0 ? (
+                  <CommandEmpty>No categories found.</CommandEmpty>
+                ) : (
+                  categories.map((category) => {
+                    const IconComponent = category.icon
+                      ? (Icons[
+                          category.icon as keyof typeof Icons
+                        ] as React.ElementType)
+                      : null;
+
+                    return (
+                      <CommandItem
+                        key={category.id}
+                        onSelect={() => toggleCategory(category.id)}
+                        className="flex items-center gap-2 cursor-pointer"
+                      >
+                        <div
+                          className={`flex items-center justify-center w-4 h-4 rounded ${
+                            selectedCategories.includes(category.id)
+                              ? "bg-primary"
+                              : "border"
+                          }`}
+                        >
+                          {selectedCategories.includes(category.id) && (
+                            <span className="text-primary-foreground text-xs">
+                              ✓
+                            </span>
+                          )}
+                        </div>
+                        {IconComponent && (
+                          <IconComponent
+                            className="h-4 w-4"
+                            style={
+                              category.color
+                                ? { color: category.color }
+                                : undefined
+                            }
+                          />
+                        )}
+                        {category.name}
+                      </CommandItem>
+                    );
+                  })
+                )}
               </CommandGroup>
             </CommandList>
           </Command>
@@ -107,18 +138,29 @@ export function CategorySelector({
           {selectedCategories.map((categoryId) => {
             const category = categories.find((c) => c.id === categoryId);
             if (!category) return null;
+            const IconComponent = category.icon
+              ? (Icons[
+                  category.icon as keyof typeof Icons
+                ] as React.ElementType)
+              : null;
             return (
-              <div
+              <button
+                type="button"
                 key={category.id}
-                className="flex items-center gap-1.5 cursor-pointer"
+                className="inline-flex items-center gap-1.5 bg-accent px-2 py-1 rounded-md"
                 onClick={() => toggleCategory(category.id)}
               >
-                {category.icon && (
-                  <span>{getCategoryIcon(category)}</span>
+                {IconComponent && (
+                  <IconComponent
+                    className="h-4 w-4"
+                    style={
+                      category.color ? { color: category.color } : undefined
+                    }
+                  />
                 )}
                 <span className="text-sm">{category.name}</span>
-                <X className="h-3 w-3" />
-              </div>
+                <X className="h-3 w-3 opacity-60 hover:opacity-100" />
+              </button>
             );
           })}
         </div>

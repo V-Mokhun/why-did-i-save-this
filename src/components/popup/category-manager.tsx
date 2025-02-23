@@ -1,18 +1,26 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Plus, X } from "lucide-react";
 import * as Icons from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { Category } from "@/lib/types";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useCategories } from "@/lib/hooks";
 
 interface CategoryManagerProps {
-  onSaveCategory: (category: Category) => Promise<void>;
+  categoryToEdit?: Category;
+  isOpen: boolean;
+  setIsOpen: (isOpen: boolean) => void;
+  onSaveCategory: (category: Category) => void;
+  trigger?: React.ReactNode;
 }
 
 const PRESET_COLORS = [
@@ -27,7 +35,6 @@ const PRESET_COLORS = [
   "#8b5cf6",
   "#d946ef",
   "#ec4899",
-  "#f43f5e",
 ];
 
 const PRESET_ICONS: (keyof typeof Icons)[] = [
@@ -46,136 +53,183 @@ const PRESET_ICONS: (keyof typeof Icons)[] = [
   "Star",
   "Video",
   "Zap",
+  "Activity",
+  "Dumbbell",
 ];
 
-export function CategoryManager({ onSaveCategory }: CategoryManagerProps) {
-  const [name, setName] = useState("");
-  const [color, setColor] = useState<string | undefined>(undefined);
-  const [icon, setIcon] = useState<string | undefined>(undefined);
-  const [isOpen, setIsOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+export function CategoryManager({
+  categoryToEdit,
+  isOpen,
+  setIsOpen,
+  onSaveCategory,
+  trigger,
+}: CategoryManagerProps) {
+  const [name, setName] = useState(categoryToEdit?.name || "");
+  const [color, setColor] = useState<string | undefined>(categoryToEdit?.color);
+  const [icon, setIcon] = useState<string | undefined>(categoryToEdit?.icon);
+  const [error, setError] = useState("");
+  const { categories } = useCategories();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  useEffect(() => {
+    if (categoryToEdit) {
+      setName(categoryToEdit.name);
+      setColor(categoryToEdit.color);
+      setIcon(categoryToEdit.icon);
+    }
+  }, [categoryToEdit]);
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim()) return;
+    e.stopPropagation();
+    setError("");
 
-    const newCategory: Category = {
-      id: crypto.randomUUID(),
+    if (!name.trim()) {
+      setError("Category name is required");
+      return;
+    }
+
+    const duplicateName = categories.find(
+      (c) =>
+        c.name.toLowerCase() === name.trim().toLowerCase() &&
+        c.id !== categoryToEdit?.id
+    );
+
+    if (duplicateName) {
+      setError("Category name already exists");
+      return;
+    }
+
+    const updatedCategory: Category = {
+      id: categoryToEdit?.id || crypto.randomUUID(),
       name: name.trim(),
       ...(color && { color }),
       ...(icon && { icon }),
     };
 
-    await onSaveCategory(newCategory);
+    onSaveCategory(updatedCategory);
+    handleClose();
+  };
+
+  const handleClose = () => {
     setName("");
     setColor(undefined);
     setIcon(undefined);
+    setError("");
     setIsOpen(false);
   };
 
-  const filteredIcons = PRESET_ICONS.filter(iconName =>
-    iconName.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
   return (
-    <Popover open={isOpen} onOpenChange={setIsOpen}>
-      <PopoverTrigger asChild>
-        <Button variant="outline" size="sm">
-          <Plus className="h-4 w-4 mr-1" />
-          Add Category
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-80">
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label>Category Name</Label>
-            <Input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Enter category name"
-            />
-          </div>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
+        {trigger || (
+          <Button variant="outline" size="sm">
+            <Plus className="h-4 w-4 mr-1" />
+            {categoryToEdit ? "Edit Category" : "Add Category"}
+          </Button>
+        )}
+      </DialogTrigger>
+      <DialogContent
+        closeButtonClassName="top-2 right-2"
+        onCloseButtonClick={handleClose}
+        className="max-w-[350px] max-h-[450px] p-0"
+      >
+        <DialogHeader className="px-4 py-2 border-b">
+          <DialogTitle>
+            {categoryToEdit ? "Edit Category" : "Create New Category"}
+          </DialogTitle>
+        </DialogHeader>
 
-          <div className="space-y-2">
-            <Label>Icon (Optional)</Label>
-            <Input
-              type="text"
-              placeholder="Search icons..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <div className="grid grid-cols-6 gap-2 max-h-[200px] overflow-y-auto p-1">
-              <button
-                type="button"
-                className={`aspect-square rounded flex items-center justify-center ${
-                  !icon ? "ring-2" : ""
-                }`}
-                onClick={() => setIcon(undefined)}
-              >
-                <X className="h-4 w-4" />
-              </button>
-              {filteredIcons.map((iconName) => {
-                const Icon = Icons[
-                  iconName as keyof typeof Icons
-                ] as React.ElementType;
-                return (
-                  <button
-                    key={iconName}
-                    type="button"
-                    onClick={() => setIcon(iconName)}
-                    className={`aspect-square rounded flex flex-col items-center justify-center p-1 ${
-                      icon === iconName ? "ring-2" : ""
-                    }`}
-                    title={iconName}
-                  >
-                    <Icon className="h-4 w-4" />
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Color (Optional)</Label>
-            <div className="grid grid-cols-6 gap-2">
-              <button
-                type="button"
-                className={`w-6 h-6 rounded-full flex items-center justify-center ${
-                  !color ? "ring-2" : ""
-                }`}
-                onClick={() => setColor(undefined)}
-              >
-                <X className="h-4 w-4" />
-              </button>
-              {PRESET_COLORS.map((presetColor) => (
-                <button
-                  key={presetColor}
-                  type="button"
-                  className={`w-6 h-6 rounded-full ${
-                    color === presetColor ? "ring-2" : ""
-                  }`}
-                  style={{ backgroundColor: presetColor }}
-                  onClick={() => setColor(presetColor)}
+        <form onSubmit={handleSubmit}>
+          <ScrollArea className="h-full max-h-[300px]">
+            <div className="px-4 py-2 space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="categoryName">
+                  Category Name <span className="text-destructive">*</span>
+                </Label>
+                <Input
+                  id="categoryName"
+                  value={name}
+                  onChange={(e) => {
+                    setName(e.target.value);
+                    setError("");
+                  }}
+                  placeholder="Enter category name"
+                  aria-invalid={!!error}
                 />
-              ))}
-            </div>
-          </div>
+                {error && <p className="text-sm text-destructive">{error}</p>}
+              </div>
 
-          <div className="flex justify-end gap-2">
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsOpen(false)}
-            >
+              <div className="space-y-2">
+                <Label>Icon (Optional)</Label>
+                <div className="grid grid-cols-6 gap-2 p-1">
+                  <button
+                    type="button"
+                    className={`aspect-square rounded flex items-center justify-center border ${
+                      !icon ? "ring-2 ring-primary" : ""
+                    }`}
+                    onClick={() => setIcon(undefined)}
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                  {PRESET_ICONS.map((iconName) => {
+                    const Icon = Icons[
+                      iconName as keyof typeof Icons
+                    ] as React.ElementType;
+                    return (
+                      <button
+                        key={iconName}
+                        type="button"
+                        onClick={() => setIcon(iconName)}
+                        className={`aspect-square rounded flex items-center justify-center border hover:bg-accent ${
+                          icon === iconName ? "ring-2 ring-primary" : ""
+                        }`}
+                        title={iconName}
+                      >
+                        <Icon className="h-4 w-4" />
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Color (Optional)</Label>
+                <div className="grid grid-cols-6 gap-2">
+                  <button
+                    type="button"
+                    className={`w-8 h-8 rounded-full flex items-center justify-center border ${
+                      !color ? "ring-2 ring-primary" : ""
+                    }`}
+                    onClick={() => setColor(undefined)}
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                  {PRESET_COLORS.map((presetColor) => (
+                    <button
+                      key={presetColor}
+                      type="button"
+                      className={`w-8 h-8 rounded-full border ${
+                        color === presetColor ? "ring-2 ring-primary" : ""
+                      }`}
+                      style={{ backgroundColor: presetColor }}
+                      onClick={() => setColor(presetColor)}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+          </ScrollArea>
+
+          <div className="flex justify-end gap-2 border-t px-4 py-2">
+            <Button type="button" variant="outline" onClick={handleClose}>
               Cancel
             </Button>
-            <Button type="submit" size="sm" disabled={!name.trim()}>
-              Save Category
+            <Button type="submit" disabled={!name.trim()}>
+              {categoryToEdit ? "Save" : "Create"}
             </Button>
           </div>
         </form>
-      </PopoverContent>
-    </Popover>
+      </DialogContent>
+    </Dialog>
   );
 }

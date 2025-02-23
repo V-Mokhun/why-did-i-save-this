@@ -10,6 +10,5 @@ export interface SavedLink {
   title: string;
   note: string;
   timestamp: number;
-  tags?: string[];
   categories?: string[];
 }
