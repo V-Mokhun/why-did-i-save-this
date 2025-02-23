@@ -17,7 +17,7 @@ import { Category } from "@/lib/types";
 import * as Icons from "lucide-react";
 import { ChevronsUpDown, Plus, X } from "lucide-react";
 import { useState } from "react";
-import { CategoryManager } from "./category-manager";
+import { CategoryManager } from "@/components/dialogs/category-manager";
 import { useCategories } from "@/lib/hooks";
 
 interface CategorySelectorProps {
@@ -45,7 +45,7 @@ export function CategorySelector({
 
   return (
     <div className="space-y-2">
-      <Popover open={open} onOpenChange={setOpen}>
+      <Popover open={open} onOpenChange={setOpen} modal={true}>
         <PopoverTrigger asChild>
           <Button
             variant="outline"

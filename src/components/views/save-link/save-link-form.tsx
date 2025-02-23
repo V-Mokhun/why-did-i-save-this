@@ -46,7 +46,7 @@ export function SaveLinkForm({
         return;
       }
 
-      const noteData: SavedLink = {
+      const linkData: SavedLink = {
         url: editedUrl,
         title: editedTitle,
         note,
@@ -54,7 +54,7 @@ export function SaveLinkForm({
         timestamp: Date.now(),
       };
 
-      await onSave(noteData);
+      await onSave(linkData);
 
       setNote("");
       setSelectedCategories([]);
@@ -112,7 +112,7 @@ export function SaveLinkForm({
           </Button>
         )}
         <Button type="submit" disabled={!note.trim()}>
-          Save Note
+          Save Link
         </Button>
       </div>
     </form>

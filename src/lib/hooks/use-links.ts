@@ -1,104 +1,80 @@
-import { useCallback, useState, useEffect } from "react";
-import browser from "webextension-polyfill";
+import { useCallback } from "react";
 import { SavedLink } from "../types";
+import { useStorage } from "./use-storage";
 
-const STORAGE_KEY = "saved_links";
+const STORAGE_KEY = "links";
 
 export function useLinks() {
-  const [links, setLinks] = useState<SavedLink[]>([]);
-
-  const getAllLinks = useCallback(async (): Promise<SavedLink[]> => {
-    try {
-      const result = await browser.storage.local.get(STORAGE_KEY);
-      const links = (result[STORAGE_KEY] || []) as SavedLink[];
-      return links;
-    } catch (error) {
-      console.error("Error fetching links:", error);
-      return [];
-    }
-  }, []);
-
-  // Load links initially and keep them updated
-  useEffect(() => {
-    getAllLinks().then(setLinks);
-
-    // Listen for storage changes
-    const handleStorageChange = async (changes: { [key: string]: any }) => {
-      if (changes[STORAGE_KEY]) {
-        const newLinks = changes[STORAGE_KEY].newValue || [];
-        setLinks(newLinks);
-      }
-    };
-
-    browser.storage.onChanged.addListener(handleStorageChange);
-    return () => {
-      browser.storage.onChanged.removeListener(handleStorageChange);
-    };
-  }, [getAllLinks]);
+  const [links, setLinks] = useStorage<SavedLink[]>(STORAGE_KEY, []);
 
   const saveLink = useCallback(
     async (
-      note: SavedLink,
-      onDuplicateFound?: () => Promise<boolean>
-    ): Promise<boolean> => {
+      link: SavedLink,
+      onDuplicate?: () => void
+    ): Promise<boolean | Function> => {
       try {
-        const currentLinks = await getAllLinks();
-        const existingIndex = currentLinks.findIndex((link) => link.url === note.url);
+        const existingLinkIndex = links.findIndex((l) => l.url === link.url);
 
-        if (existingIndex !== -1) {
-          if (onDuplicateFound) {
-            const shouldUpdate = await onDuplicateFound();
-            if (!shouldUpdate) {
-              return false;
-            }
+        if (existingLinkIndex !== -1) {
+          const updatedLinks = [...links];
+          updatedLinks[existingLinkIndex] = link;
+
+          if (onDuplicate) {
+            onDuplicate();
+            return () => {
+              setLinks(updatedLinks);
+            };
           }
-          currentLinks[existingIndex] = note;
-        } else {
-          currentLinks.push(note);
+
+          setLinks(updatedLinks);
+          return true;
         }
 
-        await browser.storage.local.set({ [STORAGE_KEY]: currentLinks });
-        setLinks(currentLinks);
+        setLinks([...links, link]);
         return true;
       } catch (error) {
         console.error("Error saving link:", error);
         return false;
       }
     },
-    [getAllLinks]
+    [links, setLinks]
   );
 
-  const deleteLink = useCallback(async (url: string): Promise<boolean> => {
-    try {
-      const currentLinks = await getAllLinks();
-      const filteredLinks = currentLinks.filter((link) => link.url !== url);
-      await browser.storage.local.set({ [STORAGE_KEY]: filteredLinks });
-      setLinks(filteredLinks);
-      return true;
-    } catch (error) {
-      console.error("Error deleting link:", error);
-      return false;
-    }
-  }, [getAllLinks]);
-
-  const getLinkByUrl = useCallback(
-    async (url: string): Promise<SavedLink | undefined> => {
+  const deleteLink = useCallback(
+    async (url: string): Promise<boolean> => {
       try {
-        const currentLinks = await getAllLinks();
-        return currentLinks.find((link) => link.url === url);
+        setLinks(links.filter((link) => link.url !== url));
+        return true;
       } catch (error) {
-        console.error("Error fetching link:", error);
-        return undefined;
+        console.error("Error deleting link:", error);
+        return false;
       }
     },
-    [getAllLinks]
+    [links, setLinks]
+  );
+
+  const updateLink = useCallback(
+    async (url: string, updates: Partial<SavedLink>): Promise<boolean> => {
+      try {
+        const linkIndex = links.findIndex((link) => link.url === url);
+        if (linkIndex === -1) return false;
+
+        const updatedLinks = [...links];
+        updatedLinks[linkIndex] = { ...links[linkIndex], ...updates };
+        setLinks(updatedLinks);
+        return true;
+      } catch (error) {
+        console.error("Error updating link:", error);
+        return false;
+      }
+    },
+    [links, setLinks]
   );
 
   return {
     links,
-    getAllLinks,
     saveLink,
     deleteLink,
-    getLinkByUrl,
+    updateLink,
   };
 }

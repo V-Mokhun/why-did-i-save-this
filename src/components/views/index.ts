@@ -1,2 +1,5 @@
-export * from "./save-link-view";
-export * from "./main-view";
+export * from "./save-link";
+export * from "./home";
+export * from "./cold-storage";
+export * from "./trash";
+export * from "./settings";

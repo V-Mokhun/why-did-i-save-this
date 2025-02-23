@@ -1,11 +1,11 @@
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogTitle,
   DialogHeader,
   DialogContent,
   DialogFooter,
-} from "./ui/dialog";
+} from "@/components/ui/dialog";
 
 interface ConfirmDialogProps {
   open: boolean;
