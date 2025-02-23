@@ -23,6 +23,8 @@ export const SaveLinkView = ({ isOpen, setIsOpen }: SaveLinkViewProps) => {
 
     if (typeof result === "function") {
       onConfirm.current = result;
+    } else {
+      setIsOpen(false);
     }
   };
 
@@ -32,6 +34,7 @@ export const SaveLinkView = ({ isOpen, setIsOpen }: SaveLinkViewProps) => {
     }
 
     setShowConfirm(false);
+    setIsOpen(false);
   };
 
   const handleCancel = () => {

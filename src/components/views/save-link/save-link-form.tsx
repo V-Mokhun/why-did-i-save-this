@@ -12,7 +12,7 @@ interface SaveLinkFormProps {
   url: string;
   title: string;
   onSave: (link: SavedLink) => Promise<void>;
-  onCancel?: () => void;
+  onCancel: () => void;
 }
 
 export function SaveLinkForm({
@@ -40,7 +40,8 @@ export function SaveLinkForm({
         urlObj.protocol === "file:"
       ) {
         toast.error("Cannot save this URL", {
-          description: "Browser-specific and file URLs cannot be saved.",
+          description:
+            "URLs that start with about:, chrome:, edge:, or file: cannot be saved.",
           closeButton: true,
         });
         return;
@@ -55,13 +56,13 @@ export function SaveLinkForm({
       };
 
       await onSave(linkData);
-
       setNote("");
       setSelectedCategories([]);
     } catch (error) {
       toast.error("Invalid URL", {
         description:
           "URLs that start with about:, chrome:, edge:, or file: cannot be saved.",
+        closeButton: true,
       });
     }
   };
@@ -72,6 +73,7 @@ export function SaveLinkForm({
         <div className="space-y-1">
           <Label>Title</Label>
           <Input
+            maxLength={50}
             value={editedTitle}
             onChange={(e) => setEditedTitle(e.target.value)}
           />
@@ -97,20 +99,19 @@ export function SaveLinkForm({
       <div className="space-y-1">
         <Label>Note</Label>
         <Textarea
-          placeholder="Write your note here..."
+          placeholder="Why are you saving this?"
           value={note}
           onChange={(e) => setNote(e.target.value)}
           className="min-h-20 resize-none"
+          maxLength={100}
           required
         />
       </div>
 
       <div className="flex gap-2 justify-end">
-        {onCancel && (
-          <Button type="button" variant="outline" onClick={onCancel}>
-            Cancel
-          </Button>
-        )}
+        <Button type="button" variant="outline" onClick={onCancel}>
+          Cancel
+        </Button>
         <Button type="submit" disabled={!note.trim()}>
           Save Link
         </Button>
