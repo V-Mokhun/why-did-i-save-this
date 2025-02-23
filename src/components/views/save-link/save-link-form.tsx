@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { CategorySelector } from "./category-selector";
 import { SavedLink } from "@/lib/types";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useCategories } from "@/lib/hooks";
 
 interface SaveLinkFormProps {
@@ -13,6 +13,7 @@ interface SaveLinkFormProps {
   title: string;
   onSave: (link: SavedLink) => Promise<void>;
   onCancel: () => void;
+  editingLink?: SavedLink | null;
 }
 
 export function SaveLinkForm({
@@ -20,11 +21,14 @@ export function SaveLinkForm({
   title,
   onSave,
   onCancel,
+  editingLink,
 }: SaveLinkFormProps) {
   const [editedTitle, setEditedTitle] = useState(title);
   const [editedUrl, setEditedUrl] = useState(url);
-  const [note, setNote] = useState("");
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [note, setNote] = useState(editingLink?.note || "");
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(
+    editingLink?.categories || []
+  );
   const { categories } = useCategories();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -66,6 +70,13 @@ export function SaveLinkForm({
       });
     }
   };
+
+  useEffect(() => {
+    if (editingLink) {
+      setNote(editingLink.note);
+      setSelectedCategories(editingLink.categories || []);
+    }
+  }, [editingLink]);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -113,7 +124,7 @@ export function SaveLinkForm({
           Cancel
         </Button>
         <Button type="submit" disabled={!note.trim()}>
-          Save Link
+          {editingLink ? "Update Link" : "Save Link"}
         </Button>
       </div>
     </form>

@@ -158,7 +158,7 @@ export function CategorySelector({
               <button
                 type="button"
                 key={category.id}
-                className="inline-flex items-center gap-1.5 bg-accent px-2 py-1 rounded-md"
+                className="inline-flex items-center gap-1.5 bg-accent px-2 py-1 rounded-md cursor-pointer"
                 onClick={() => toggleCategory(category.id)}
               >
                 {IconComponent && (

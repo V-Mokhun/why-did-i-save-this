@@ -11,6 +11,7 @@ export interface SavedLink {
   note: string;
   timestamp: number;
   categories?: string[];
+  isPinned?: boolean;
 }
 
 export type View = "home" | "cold-storage" | "trash" | "settings";

@@ -8,15 +8,29 @@ import { SaveLinkForm } from "./save-link-form";
 interface SaveLinkViewProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
+  editingLink?: SavedLink | null;
 }
 
-export const SaveLinkView = ({ isOpen, setIsOpen }: SaveLinkViewProps) => {
+export const SaveLinkView = ({
+  isOpen,
+  setIsOpen,
+  editingLink,
+}: SaveLinkViewProps) => {
   const currentTab = useCurrentTab();
   const [showConfirm, setShowConfirm] = useState(false);
-  const { saveLink } = useLinks();
+  const { saveLink, updateLink } = useLinks();
   const onConfirm = useRef<Function>(null);
 
   const handleSave = async (link: SavedLink) => {
+    if (editingLink) {
+      const result = await updateLink(editingLink.url, link);
+      if (result) {
+        setIsOpen(false);
+      }
+
+      return;
+    }
+
     const result = await saveLink(link, () => {
       setShowConfirm(true);
     });
@@ -44,13 +58,14 @@ export const SaveLinkView = ({ isOpen, setIsOpen }: SaveLinkViewProps) => {
   return (
     <>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent>
+        <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
           <DialogTitle className="sr-only">Save Link</DialogTitle>
           <SaveLinkForm
-            url={currentTab?.url || ""}
-            title={currentTab?.title || ""}
+            url={editingLink?.url || currentTab?.url || ""}
+            title={editingLink?.title || currentTab?.title || ""}
             onSave={handleSave}
             onCancel={() => setIsOpen(false)}
+            editingLink={editingLink}
           />
         </DialogContent>
       </Dialog>
