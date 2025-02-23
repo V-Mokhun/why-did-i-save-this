@@ -42,12 +42,12 @@ This document outlines the complete UI flow for the extension, detailing each vi
 
 ---
 
-### 2.2. Main View (Dashboard)
+### 2.2. Main View (Home)
 
 - **Purpose:** Display all saved links in a unified list with filtering and sorting capabilities.
 - **Layout & Components:**
   - **Header:**
-    - Large, prominent heading: “Dashboard”
+    - Large, prominent heading: “Home”
     - **Search Bar:** Directly below the heading; filters links by title, category, or note content in real time.
   - **Filter Controls:**
     - **Quick Filter Tabs:** Horizontal tabs or pill-style buttons for:

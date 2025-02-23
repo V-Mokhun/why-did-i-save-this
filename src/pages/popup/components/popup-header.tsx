@@ -1,7 +1,6 @@
-import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import logo from "@assets/img/logo.svg";
 import { Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
 
 interface PopupHeaderProps {
   onSearch?: (query: string) => void;
