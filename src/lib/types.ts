@@ -15,6 +15,9 @@ export interface SavedLink {
   lastOpenedAt?: number;
   deletedAt?: number;
   isDeleted?: boolean;
+  position?: number;
 }
 
 export type View = "home" | "cold-storage" | "trash" | "settings";
+
+export type ReorderState = "viewing" | "reordering";

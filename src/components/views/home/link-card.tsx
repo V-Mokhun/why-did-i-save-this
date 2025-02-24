@@ -10,7 +10,7 @@ interface LinkCardProps {
   onPin: (link: SavedLink) => void;
   onEdit: (link: SavedLink) => void;
   onDelete: (link: SavedLink) => void;
-  onOpen: () => void;
+  onOpen?: () => void;
 }
 
 export const LinkCard = ({
@@ -26,7 +26,7 @@ export const LinkCard = ({
   );
 
   const handleOpen = async () => {
-    onOpen();
+    onOpen?.();
     await browser.tabs.create({ url: link.url });
   };
 
