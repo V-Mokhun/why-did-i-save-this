@@ -60,11 +60,40 @@ export function useLinks() {
         if (linkIndex === -1) return false;
 
         const updatedLinks = [...links];
-        updatedLinks[linkIndex] = { ...links[linkIndex], ...updates };
+        updatedLinks[linkIndex] = {
+          ...links[linkIndex],
+          ...updates,
+        };
+
         setLinks(updatedLinks);
         return true;
       } catch (error) {
         console.error("Error updating link:", error);
+        return false;
+      }
+    },
+    [links, setLinks]
+  );
+
+  const batchUpdateLinks = useCallback(
+    async (updates: Array<{ url: string; updates: Partial<SavedLink> }>): Promise<boolean> => {
+      try {
+        const updatedLinks = [...links];
+        
+        for (const update of updates) {
+          const linkIndex = updatedLinks.findIndex((link) => link.url === update.url);
+          if (linkIndex !== -1) {
+            updatedLinks[linkIndex] = {
+              ...updatedLinks[linkIndex],
+              ...update.updates,
+            };
+          }
+        }
+        
+        setLinks(updatedLinks);
+        return true;
+      } catch (error) {
+        console.error("Error batch updating links:", error);
         return false;
       }
     },
@@ -134,6 +163,7 @@ export function useLinks() {
     saveLink,
     deleteLink,
     updateLink,
+    batchUpdateLinks,
     moveToTrash,
     restoreFromTrash,
     emptyTrash,

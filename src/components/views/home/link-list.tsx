@@ -3,7 +3,7 @@ import { Category, SavedLink } from "@/lib/types";
 import { LinkCard } from "./link-card";
 import { QuickFilter } from "./quick-filter-tabs";
 import { useLinks, useReorder } from "@/lib/hooks";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { SaveLinkView } from "../save-link";
 import { toast } from "sonner";
 import {
@@ -16,7 +16,6 @@ import {
   useSensors,
   DragStartEvent,
   DragEndEvent,
-  UniqueIdentifier,
 } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -31,6 +30,7 @@ interface LinkListProps {
   searchQuery: string;
   selectedFilter: QuickFilter | null;
   selectedCategories: string[];
+  onReorder: (oldIndex: number, newIndex: number, items: SavedLink[]) => void;
 }
 
 export const LinkList = ({
@@ -39,6 +39,7 @@ export const LinkList = ({
   searchQuery,
   selectedFilter,
   selectedCategories,
+  onReorder,
 }: LinkListProps) => {
   const { updateLink, moveToTrash, restoreFromTrash } = useLinks();
   const { isReordering } = useReorder();
@@ -75,43 +76,10 @@ export const LinkList = ({
   };
 
   const handleDragStart = (event: DragStartEvent) => {
-    console.log('Drag started:', event);
     setActiveId(event.active.id.toString());
   };
 
-  const handleDragEnd = async (event: DragEndEvent) => {
-    console.log('Drag ended:', event);
-    setActiveId(null);
-
-    if (!event.over) return;
-
-    const oldIndex = sortedLinks.findIndex(
-      (link) => link.url === event.active.id.toString()
-    );
-    const newIndex = sortedLinks.findIndex(
-      (link) => link.url === event.over!.id.toString()
-    );
-
-    console.log('Indices:', { oldIndex, newIndex });
-
-    if (oldIndex !== newIndex) {
-      const updates = sortedLinks.map((link, index) => {
-        if (index === oldIndex) return { ...link, position: newIndex };
-        if (index === newIndex) return { ...link, position: oldIndex };
-        return link;
-      });
-
-      console.log('Updates:', updates);
-
-      // Update positions in database
-      await Promise.all(
-        updates.map((link) => updateLink(link.url, { position: link.position }))
-      );
-    }
-  };
-
   const filteredLinks = links.filter((link) => {
-    // Search filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       const matchesSearch =
@@ -121,7 +89,6 @@ export const LinkList = ({
       if (!matchesSearch) return false;
     }
 
-    // Category filter
     if (selectedCategories.length > 0) {
       const hasSelectedCategory = selectedCategories.some((categoryId) =>
         link.categories?.includes(categoryId)
@@ -129,7 +96,6 @@ export const LinkList = ({
       if (!hasSelectedCategory) return false;
     }
 
-    // Quick filter
     if (selectedFilter) {
       switch (selectedFilter) {
         case "pinned":
@@ -151,18 +117,38 @@ export const LinkList = ({
   });
 
   const sortedLinks = [...filteredLinks].sort((a, b) => {
-    // First sort by pinned status
     if (a.isPinned && !b.isPinned) return -1;
     if (!a.isPinned && b.isPinned) return 1;
 
-    // Then sort by position if available
     if (a.position !== undefined && b.position !== undefined) {
       return a.position - b.position;
     }
 
-    // Finally sort by timestamp
     return b.timestamp - a.timestamp;
   });
+
+  const handleDragEnd = useCallback(
+    async (event: DragEndEvent) => {
+      console.log("Drag ended:", event);
+      setActiveId(null);
+
+      if (!event.over) return;
+
+      const activeId = event.active.id.toString();
+      const overId = event.over.id.toString();
+
+      if (activeId === overId) return;
+
+      const oldIndex = sortedLinks.findIndex((link) => link.url === activeId);
+      const newIndex = sortedLinks.findIndex((link) => link.url === overId);
+
+      if (oldIndex !== newIndex) {
+        onReorder(oldIndex, newIndex, sortedLinks);
+      }
+    },
+    [sortedLinks, onReorder]
+  );
+  console.log("savedLinks", links);
 
   if (sortedLinks.length === 0) {
     return (
