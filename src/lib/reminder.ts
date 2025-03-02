@@ -7,13 +7,9 @@ export const checkLinkNeedsAttention = (link: SavedLink) => {
   const reminderThreshold =
     Date.now() - link.reminderDays * 24 * 60 * 60 * 1000;
 
-  if (
-    (link.lastOpenedAt && link.lastOpenedAt < reminderThreshold) ||
-    (!link.lastOpenedAt && link.timestamp < reminderThreshold)
-  ) {
-    return true;
-  }
-  return false;
+  const lastActivity = link.lastOpenedAt || link.timestamp;
+
+  return lastActivity < reminderThreshold;
 };
 
 interface StorageData {

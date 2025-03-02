@@ -4,3 +4,4 @@ export * from "./use-categories";
 export * from "./use-current-tab";
 export * from "./use-reorder";
 export * from "./use-reminder";
+export * from "./use-archive-settings";

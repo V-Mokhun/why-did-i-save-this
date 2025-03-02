@@ -67,13 +67,13 @@ This checklist outlines every step required to build the "Why Did I Save This?" 
 ---
 
 ## 5. Reminder System Implementation
-- [ ] **Define Reminder Logic**
-  - [ ] Set conditions to flag links not opened within a configurable timeframe (default: 7 days).
-- [ ] **UI for Reminders**
-  - [ ] Add a "Needs Attention" section in the popup.
-  - [ ] Display visual cues (e.g., color-coded badges, glow effects) for overdue links.
-- [ ] **Optional Extension Badge**
-  - [ ] (Optional) Add functionality to display a badge on the extension icon indicating pending reminders.
+- [x] **Define Reminder Logic**
+  - [x] Set conditions to flag links not opened within a configurable timeframe (default: 7 days).
+- [x] **UI for Reminders**
+  - [x] Add a "Needs Attention" section in the popup.
+  - [x] Display visual cues (e.g., color-coded badges, glow effects) for overdue links.
+- [x] **Optional Extension Badge**
+  - [x] (Optional) Add functionality to display a badge on the extension icon indicating pending reminders.
 
 ---
 

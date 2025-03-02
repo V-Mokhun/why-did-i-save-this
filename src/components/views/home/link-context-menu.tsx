@@ -26,8 +26,8 @@ export const LinkContextMenu = ({
   onOpen,
 }: LinkContextMenuProps) => {
   return (
-    <ContextMenu>
-      <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
+    <ContextMenu >
+      <ContextMenuTrigger>{children}</ContextMenuTrigger>
       <ContextMenuContent className="w-48">
         <ContextMenuItem onClick={onOpen}>
           <ExternalLink className="h-4 w-4 mr-2" />

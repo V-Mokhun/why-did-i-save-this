@@ -114,7 +114,7 @@ export const TrashView = () => {
           </p>
         </div>
       ) : (
-        <ScrollArea className="flex-1">
+        <ScrollArea className="flex-1 w-full">
           <div className="space-y-2 py-2">
             {filteredLinks.map((link) => (
               <TrashedLinkItem

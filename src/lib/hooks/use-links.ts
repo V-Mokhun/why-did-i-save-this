@@ -3,10 +3,10 @@ import { SavedLink } from "../types";
 import { useStorage } from "./use-storage";
 import { updateBadge } from "../reminder";
 
-const STORAGE_KEY = "links";
+export const LINKS_KEY = "links";
 
 export function useLinks() {
-  const [links, setLinks] = useStorage<SavedLink[]>(STORAGE_KEY, []);
+  const [links, setLinks] = useStorage<SavedLink[]>(LINKS_KEY, []);
 
   const saveLink = useCallback(
     async (
@@ -130,6 +130,7 @@ export function useLinks() {
           isDeleted: true,
           deletedAt: Date.now(),
           isPinned: false,
+          isArchived: false,
         };
 
         setLinks(updatedLinks);
@@ -181,9 +182,85 @@ export function useLinks() {
     }
   }, [links, setLinks]);
 
+  const moveToArchive = useCallback(
+    async (url: string): Promise<boolean> => {
+      try {
+        const linkIndex = links.findIndex((link) => link.url === url);
+        if (linkIndex === -1) return false;
+
+        const updatedLinks = [...links];
+        updatedLinks[linkIndex] = {
+          ...links[linkIndex],
+          isArchived: true,
+          archivedAt: Date.now(),
+        };
+
+        setLinks(updatedLinks);
+        return true;
+      } catch (error) {
+        console.error("Error moving link to archive:", error);
+        return false;
+      }
+    },
+    [links, setLinks]
+  );
+
+  const restoreFromArchive = useCallback(
+    async (url: string): Promise<boolean> => {
+      try {
+        const linkIndex = links.findIndex((link) => link.url === url);
+        if (linkIndex === -1) return false;
+
+        const updatedLinks = [...links];
+        updatedLinks[linkIndex] = {
+          ...links[linkIndex],
+          isArchived: false,
+          archivedAt: undefined,
+          lastOpenedAt: Date.now(),
+        };
+
+        setLinks(updatedLinks);
+        return true;
+      } catch (error) {
+        console.error("Error restoring link from archive:", error);
+        return false;
+      }
+    },
+    [links, setLinks]
+  );
+
+  const batchArchiveLinks = useCallback(
+    async (urls: string[]): Promise<boolean> => {
+      try {
+        const now = Date.now();
+        const updatedLinks = [...links];
+
+        for (const url of urls) {
+          const linkIndex = updatedLinks.findIndex((link) => link.url === url);
+          if (linkIndex !== -1) {
+            updatedLinks[linkIndex] = {
+              ...updatedLinks[linkIndex],
+              isArchived: true,
+              archivedAt: now,
+            };
+          }
+        }
+
+        setLinks(updatedLinks);
+        return true;
+      } catch (error) {
+        console.error("Error batch archiving links:", error);
+        return false;
+      }
+    },
+    [links, setLinks]
+  );
+
   return {
-    links: links.filter((link) => !link.isDeleted),
+    links: links.filter((link) => !link.isDeleted && !link.isArchived),
+    archivedLinks: links.filter((link) => !link.isDeleted && link.isArchived),
     trashedLinks: links.filter((link) => link.isDeleted),
+    allLinks: links,
     saveLink,
     deleteLink,
     updateLink,
@@ -191,5 +268,8 @@ export function useLinks() {
     moveToTrash,
     restoreFromTrash,
     emptyTrash,
+    moveToArchive,
+    restoreFromArchive,
+    batchArchiveLinks,
   };
 }
