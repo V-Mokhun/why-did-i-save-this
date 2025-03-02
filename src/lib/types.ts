@@ -16,6 +16,7 @@ export interface SavedLink {
   deletedAt?: number;
   isDeleted?: boolean;
   position?: number;
+  reminderDays?: number;
 }
 
 export type View = "home" | "cold-storage" | "trash" | "settings";

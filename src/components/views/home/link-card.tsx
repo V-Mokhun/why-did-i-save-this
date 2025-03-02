@@ -1,8 +1,9 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Category, SavedLink } from "@/lib/types";
-import { Circle, Pin } from "lucide-react";
+import { Circle, Pin, AlertCircle } from "lucide-react";
 import { LinkContextMenu } from "./link-context-menu";
 import browser from "webextension-polyfill";
+import { checkLinkNeedsAttention } from "@/lib/reminder";
 
 interface LinkCardProps {
   link: SavedLink;
@@ -35,6 +36,8 @@ export const LinkCard = ({
     handleOpen();
   };
 
+  const needsAttention = checkLinkNeedsAttention(link);
+
   return (
     <LinkContextMenu
       link={link}
@@ -44,20 +47,27 @@ export const LinkCard = ({
       onOpen={handleOpen}
     >
       <Card
-        className="group relative py-0 rounded-sm hover:bg-accent cursor-pointer"
+        className={`group relative py-0 rounded-sm hover:bg-accent cursor-pointer ${
+          needsAttention && "border-amber-500 shadow-sm"
+        }`}
         onClick={handleClick}
       >
         <CardContent className="p-2 space-y-1">
           <div className="flex items-start gap-1">
-            {link.isPinned && (
-              <Pin className="h-3 w-3 text-muted-foreground flex-shrink-0" />
-            )}
             <h3
               className="font-medium leading-tight text-sm truncate"
               title={link.title}
             >
               {link.title}
             </h3>
+            <div className="flex items-center justify-end ml-auto gap-1">
+              {link.isPinned && (
+                <Pin className="h-3 w-3 text-muted-foreground flex-shrink-0" />
+              )}
+              {needsAttention && (
+                <AlertCircle className="h-3 w-3 text-amber-500 flex-shrink-0" />
+              )}
+            </div>
           </div>
           <p className="text-xs text-muted-foreground line-clamp-2">
             {link.note}

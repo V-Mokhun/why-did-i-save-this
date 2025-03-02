@@ -108,8 +108,18 @@ export const LinkList = ({
           if (link.lastOpenedAt < oneWeekAgo) return false;
           break;
         case "needs-attention":
-          //TODO: Implement needs attention filter
-          break;
+          if (!link.reminderDays) return false;
+
+          const reminderThreshold =
+            Date.now() - link.reminderDays * 24 * 60 * 60 * 1000;
+
+          if (
+            (link.lastOpenedAt && link.lastOpenedAt < reminderThreshold) ||
+            (!link.lastOpenedAt && Date.now() > reminderThreshold)
+          ) {
+            return true;
+          }
+          return false;
       }
     }
 

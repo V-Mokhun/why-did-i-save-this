@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import { SavedLink } from "../types";
 import { useStorage } from "./use-storage";
+import { updateBadge } from "../reminder";
 
 const STORAGE_KEY = "links";
 
@@ -23,14 +24,18 @@ export function useLinks() {
             onDuplicate();
             return () => {
               setLinks(updatedLinks);
+              setTimeout(() => updateBadge(updatedLinks), 100);
             };
           }
 
           setLinks(updatedLinks);
+          setTimeout(() => updateBadge(updatedLinks), 100);
           return true;
         }
 
-        setLinks([...links, link]);
+        const newLinks = [...links, link];
+        setLinks(newLinks);
+        setTimeout(() => updateBadge(newLinks), 100);
         return true;
       } catch (error) {
         console.error("Error saving link:", error);
@@ -43,7 +48,11 @@ export function useLinks() {
   const deleteLink = useCallback(
     async (url: string): Promise<boolean> => {
       try {
-        setLinks(links.filter((link) => link.url !== url));
+        const updatedLinks = links.filter((link) => link.url !== url);
+        setLinks(updatedLinks);
+
+        setTimeout(() => updateBadge(updatedLinks), 100);
+
         return true;
       } catch (error) {
         console.error("Error deleting link:", error);
@@ -66,6 +75,11 @@ export function useLinks() {
         };
 
         setLinks(updatedLinks);
+
+        if ("lastOpenedAt" in updates) {
+          setTimeout(() => updateBadge(updatedLinks), 100);
+        }
+
         return true;
       } catch (error) {
         console.error("Error updating link:", error);
@@ -76,12 +90,16 @@ export function useLinks() {
   );
 
   const batchUpdateLinks = useCallback(
-    async (updates: Array<{ url: string; updates: Partial<SavedLink> }>): Promise<boolean> => {
+    async (
+      updates: Array<{ url: string; updates: Partial<SavedLink> }>
+    ): Promise<boolean> => {
       try {
         const updatedLinks = [...links];
-        
+
         for (const update of updates) {
-          const linkIndex = updatedLinks.findIndex((link) => link.url === update.url);
+          const linkIndex = updatedLinks.findIndex(
+            (link) => link.url === update.url
+          );
           if (linkIndex !== -1) {
             updatedLinks[linkIndex] = {
               ...updatedLinks[linkIndex],
@@ -89,7 +107,7 @@ export function useLinks() {
             };
           }
         }
-        
+
         setLinks(updatedLinks);
         return true;
       } catch (error) {
@@ -115,6 +133,9 @@ export function useLinks() {
         };
 
         setLinks(updatedLinks);
+
+        setTimeout(() => updateBadge(updatedLinks), 100);
+
         return true;
       } catch (error) {
         console.error("Error moving link to trash:", error);
@@ -138,6 +159,9 @@ export function useLinks() {
         };
 
         setLinks(updatedLinks);
+
+        setTimeout(() => updateBadge(updatedLinks), 100);
+
         return true;
       } catch (error) {
         console.error("Error restoring link from trash:", error);
@@ -149,7 +173,7 @@ export function useLinks() {
 
   const emptyTrash = useCallback(async (): Promise<boolean> => {
     try {
-      setLinks(links.filter(link => !link.isDeleted));
+      setLinks(links.filter((link) => !link.isDeleted));
       return true;
     } catch (error) {
       console.error("Error emptying trash:", error);

@@ -6,7 +6,14 @@ import { CategorySelector } from "./category-selector";
 import { SavedLink } from "@/lib/types";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
-import { useCategories } from "@/lib/hooks";
+import { useCategories, useReminder } from "@/lib/hooks";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface SaveLinkFormProps {
   url: string;
@@ -29,6 +36,11 @@ export function SaveLinkForm({
   const [selectedCategories, setSelectedCategories] = useState<string[]>(
     editingLink?.categories || []
   );
+
+  const { reminderDays } = useReminder();
+  const [editedReminderDays, setEditedReminderDays] = useState<
+    number | undefined
+  >(editingLink?.reminderDays || reminderDays || undefined);
   const { categories } = useCategories();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -57,11 +69,13 @@ export function SaveLinkForm({
         note,
         categories: selectedCategories,
         timestamp: Date.now(),
+        reminderDays: editedReminderDays,
       };
 
       await onSave(linkData);
       setNote("");
       setSelectedCategories([]);
+      setEditedReminderDays(reminderDays || undefined);
     } catch (error) {
       toast.error("Invalid URL", {
         description:
@@ -75,8 +89,13 @@ export function SaveLinkForm({
     if (editingLink) {
       setNote(editingLink.note);
       setSelectedCategories(editingLink.categories || []);
+      setEditedReminderDays(editingLink.reminderDays);
+    } else {
+      setNote("");
+      setSelectedCategories([]);
+      setEditedReminderDays(reminderDays || undefined);
     }
-  }, [editingLink]);
+  }, [editingLink, reminderDays]);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -105,6 +124,32 @@ export function SaveLinkForm({
           selectedCategories={selectedCategories}
           onSelect={setSelectedCategories}
         />
+      </div>
+
+      <div className="space-y-1">
+        <Label htmlFor="reminder">Reminder</Label>
+        <Select
+          value={editedReminderDays?.toString() || "none"}
+          onValueChange={(value: string) =>
+            setEditedReminderDays(
+              value === "none" ? undefined : parseInt(value)
+            )
+          }
+        >
+          <SelectTrigger id="reminder">
+            <SelectValue placeholder="No reminder" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="none">No reminder</SelectItem>
+            <SelectItem value="7">Remind after 7 days</SelectItem>
+            <SelectItem value="14">Remind after 14 days</SelectItem>
+            <SelectItem value="30">Remind after 30 days</SelectItem>
+          </SelectContent>
+        </Select>
+        <p className="text-xs text-muted-foreground mt-1">
+          You'll be reminded if you don't open this link within the selected
+          timeframe.
+        </p>
       </div>
 
       <div className="space-y-1">

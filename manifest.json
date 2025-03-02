@@ -11,6 +11,10 @@
       "32": "icon-32.png"
     }
   },
+  "background": {
+    "service_worker": "src/pages/background/index.ts",
+    "type": "module"
+  },
   "icons": {
     "128": "icon-128.png"
   },
