@@ -9,6 +9,8 @@ import { LinkCard } from "@/components/shared/link-card";
 import { LinkActions, LinkAction } from "@/components/shared/link-actions";
 import { SavedLink } from "@/lib/types";
 import { formatRelativeTime } from "@/lib/date";
+import { PreArchiveNotification } from "@/components/pre-archive-notification";
+import { Button } from "@/components/ui/button";
 
 interface ColdStorageViewProps {}
 
@@ -53,7 +55,7 @@ export const ColdStorageView = ({}: ColdStorageViewProps) => {
     return (b.archivedAt || 0) - (a.archivedAt || 0);
   });
 
-  const getLinkActions = (link: SavedLink): LinkAction[] => [
+  const getLinkActions = (): LinkAction[] => [
     {
       label: "Restore",
       icon: <ArchiveRestore className="mr-2 h-4 w-4" />,
@@ -72,16 +74,6 @@ export const ColdStorageView = ({}: ColdStorageViewProps) => {
     },
   ];
 
-  const renderArchivedDate = (link: SavedLink) => {
-    if (!link.archivedAt) return null;
-
-    return (
-      <div className="text-xs text-muted-foreground mt-1">
-        Archived {formatRelativeTime(link.archivedAt)}
-      </div>
-    );
-  };
-
   return (
     <div className="flex flex-col h-full">
       <div className="p-4 border-b">
@@ -97,6 +89,8 @@ export const ColdStorageView = ({}: ColdStorageViewProps) => {
           className="w-full"
         />
       </div>
+
+      <PreArchiveNotification />
 
       {sortedLinks.length === 0 ? (
         <div className="flex flex-col items-center justify-center flex-1 p-8 text-center">
@@ -119,10 +113,31 @@ export const ColdStorageView = ({}: ColdStorageViewProps) => {
                 categories={categories}
                 onOpen={() => handleOpen(link)}
                 renderActions={(link) => (
-                  <LinkActions link={link} actions={getLinkActions(link)} />
+                  <div className="flex items-center gap-2">
+                    {getLinkActions().map((action) => (
+                      <Button
+                        key={action.label}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          action.onClick(link);
+                        }}
+                        className={`${action.className} cursor-pointer`}
+                        title={action.label}
+                        variant="ghost"
+                        size="icon-xs"
+                      >
+                        {action.icon}
+                      </Button>
+                    ))}
+                  </div>
                 )}
-                renderBadges={renderArchivedDate}
-              />
+              >
+                {link.archivedAt && (
+                  <div className="text-xs text-muted-foreground mt-1">
+                    Archived {formatRelativeTime(link.archivedAt)}
+                  </div>
+                )}
+              </LinkCard>
             ))}
           </div>
         </ScrollArea>

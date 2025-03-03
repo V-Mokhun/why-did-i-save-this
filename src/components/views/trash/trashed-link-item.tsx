@@ -22,7 +22,7 @@ export const TrashedLinkItem = ({
     await browser.tabs.create({ url: link.url });
   };
 
-  const getLinkActions = (link: SavedLink): LinkAction[] => [
+  const getLinkActions = (): LinkAction[] => [
     {
       label: "Restore",
       icon: <Undo2 className="mr-2 h-4 w-4" />,
@@ -48,7 +48,7 @@ export const TrashedLinkItem = ({
       onOpen={handleOpen}
       renderActions={(link) => (
         <div className="flex items-center gap-2">
-          {getLinkActions(link).map((action) => (
+          {getLinkActions().map((action) => (
             <Button
               key={action.label}
               onClick={(e) => {
