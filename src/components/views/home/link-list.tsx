@@ -203,7 +203,6 @@ export const LinkList = ({
                   onPin={handlePin}
                   onEdit={handleEdit}
                   onDelete={handleDelete}
-                  onOpen={() => {}}
                 />
               ) : null}
             </DragOverlay>

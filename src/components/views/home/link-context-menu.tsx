@@ -11,10 +11,10 @@ import { Pin, Pencil, Trash2, ExternalLink } from "lucide-react";
 interface LinkContextMenuProps {
   link: SavedLink;
   children: React.ReactNode;
-  onPin: () => void;
-  onEdit: () => void;
-  onDelete: () => void;
-  onOpen: () => void;
+  onPin: (e: React.MouseEvent) => void;
+  onEdit: (e: React.MouseEvent) => void;
+  onDelete: (e: React.MouseEvent) => void;
+  onOpen: (e: React.MouseEvent) => void;
 }
 
 export const LinkContextMenu = ({
@@ -26,7 +26,7 @@ export const LinkContextMenu = ({
   onOpen,
 }: LinkContextMenuProps) => {
   return (
-    <ContextMenu >
+    <ContextMenu>
       <ContextMenuTrigger>{children}</ContextMenuTrigger>
       <ContextMenuContent className="w-48">
         <ContextMenuItem onClick={onOpen}>
@@ -49,4 +49,4 @@ export const LinkContextMenu = ({
       </ContextMenuContent>
     </ContextMenu>
   );
-}; 
+};

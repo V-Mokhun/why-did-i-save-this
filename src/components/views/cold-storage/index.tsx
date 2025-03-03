@@ -37,7 +37,6 @@ export const ColdStorageView = ({}: ColdStorageViewProps) => {
 
   const handleOpen = async (link: SavedLink) => {
     await updateLink(link.url, { lastOpenedAt: Date.now() });
-    await browser.tabs.create({ url: link.url });
   };
 
   const filteredLinks = archivedLinks.filter((link) => {

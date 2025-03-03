@@ -22,7 +22,7 @@ export const LinkCard = ({
   onDelete,
   onOpen,
 }: LinkCardProps) => {
-  const handleOpen = async () => {
+  const handleOpenWithOpenLink = async () => {
     onOpen?.();
     await browser.tabs.create({ url: link.url });
   };
@@ -48,13 +48,13 @@ export const LinkCard = ({
       onPin={() => onPin(link)}
       onEdit={() => onEdit(link)}
       onDelete={() => onDelete(link)}
-      onOpen={handleOpen}
+      onOpen={handleOpenWithOpenLink}
     >
       <SharedLinkCard
         link={link}
         categories={categories}
-        onOpen={handleOpen}
         renderBadges={renderStatusBadges}
+        onOpen={onOpen}
         className={needsAttention ? "border-amber-500 shadow-sm" : ""}
       />
     </LinkContextMenu>

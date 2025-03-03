@@ -45,7 +45,6 @@ export const TrashedLinkItem = ({
     <LinkCard
       link={link}
       categories={categories}
-      onOpen={handleOpen}
       renderActions={(link) => (
         <div className="flex items-center gap-2">
           {getLinkActions().map((action) => (
