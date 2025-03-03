@@ -158,7 +158,6 @@ export const LinkList = ({
     },
     [sortedLinks, onReorder]
   );
-  console.log("savedLinks", links);
 
   if (sortedLinks.length === 0) {
     return (

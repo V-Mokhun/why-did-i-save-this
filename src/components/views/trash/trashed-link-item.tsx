@@ -22,7 +22,6 @@ export const TrashedLinkItem = ({
     await browser.tabs.create({ url: link.url });
   };
 
-  // Define actions for the link actions dropdown
   const getLinkActions = (link: SavedLink): LinkAction[] => [
     {
       label: "Restore",
@@ -42,27 +41,37 @@ export const TrashedLinkItem = ({
     },
   ];
 
-  // Render the deleted date badge
-  const renderDeletedDate = (link: SavedLink) => {
-    if (!link.deletedAt) return null;
-    
-    return (
-      <div className="text-xs text-muted-foreground mt-1">
-        Deleted {new Date(link.deletedAt).toLocaleDateString()}
-      </div>
-    );
-  };
-
   return (
     <LinkCard
       link={link}
       categories={categories}
       onOpen={handleOpen}
       renderActions={(link) => (
-        <LinkActions link={link} actions={getLinkActions(link)} />
+        <div className="flex items-center gap-2">
+          {getLinkActions(link).map((action) => (
+            <Button
+              key={action.label}
+              onClick={(e) => {
+                e.stopPropagation();
+                action.onClick(link);
+              }}
+              className={`${action.className} cursor-pointer`}
+              title={action.label}
+              variant="ghost"
+              size="icon-xs"
+            >
+              {action.icon}
+            </Button>
+          ))}
+        </div>
       )}
-      renderBadges={renderDeletedDate}
       className="bg-muted/50"
-    />
+    >
+      {link.deletedAt && (
+        <div className="text-xs text-muted-foreground mt-1">
+          Deleted {new Date(link.deletedAt).toLocaleDateString()}
+        </div>
+      )}
+    </LinkCard>
   );
 };

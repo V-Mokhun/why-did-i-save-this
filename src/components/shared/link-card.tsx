@@ -10,6 +10,9 @@ export interface LinkCardProps {
   renderActions?: (link: SavedLink) => React.ReactNode;
   renderBadges?: (link: SavedLink) => React.ReactNode;
   className?: string;
+  showCategories?: boolean;
+  showNote?: boolean;
+  children?: React.ReactNode;
 }
 
 export const LinkCard = ({
@@ -19,6 +22,9 @@ export const LinkCard = ({
   renderActions,
   renderBadges,
   className = "",
+  showCategories = true,
+  showNote = true,
+  children,
 }: LinkCardProps) => {
   const linkCategories = categories.filter((category) =>
     link.categories?.includes(category.id)
@@ -36,7 +42,7 @@ export const LinkCard = ({
 
   return (
     <Card
-      className={`group relative rounded-sm hover:bg-accent py-0 cursor-pointer ${className}`}
+      className={`group relative rounded-sm hover:bg-accent py-0 cursor-pointer h-full ${className}`}
       onClick={handleClick}
     >
       <CardContent className="p-2 space-y-1">
@@ -52,12 +58,14 @@ export const LinkCard = ({
             {renderActions?.(link)}
           </div>
         </div>
-        
-        <p className="text-xs text-muted-foreground line-clamp-2">
-          {link.note}
-        </p>
-        
-        {linkCategories.length > 0 && (
+
+        {showNote && (
+          <p className="text-xs text-muted-foreground line-clamp-2">
+            {link.note}
+          </p>
+        )}
+
+        {showCategories && linkCategories.length > 0 && (
           <div className="flex flex-wrap gap-1">
             {linkCategories.slice(0, 2).map((category) => (
               <div
@@ -78,6 +86,8 @@ export const LinkCard = ({
             )}
           </div>
         )}
+
+        {children}
       </CardContent>
     </Card>
   );
