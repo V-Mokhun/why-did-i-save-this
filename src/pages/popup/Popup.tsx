@@ -32,7 +32,7 @@ export default function Popup() {
   return (
     <div className="flex flex-col h-[600px] w-md">
       {/* <PopupHeader /> */}
-      <main className="flex-1">
+      <main className="flex-1 pb-16">
         {renderCurrentView()}
         <SaveLinkView
           isOpen={isSaveLinkDialogOpen}

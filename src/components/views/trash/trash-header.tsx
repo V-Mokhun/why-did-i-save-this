@@ -8,8 +8,8 @@ interface TrashHeaderProps {
 
 export const TrashHeader = ({ onEmptyTrash, hasItems }: TrashHeaderProps) => {
   return (
-    <div className="sticky top-0 bg-background p-2 flex items-center justify-between">
-      <h1 className="text-lg font-semibold">Trash</h1>
+    <div className="sticky top-0 bg-background p-2 flex items-center justify-between z-10 w-full mb-2 border-b">
+      <h1 className="text-xl font-semibold">Trash</h1>
       {hasItems && (
         <Button
           variant="ghost"

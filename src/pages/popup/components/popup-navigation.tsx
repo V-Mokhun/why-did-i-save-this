@@ -37,7 +37,7 @@ export const PopupNavigation = ({
   ];
 
   return (
-    <nav className="border-t p-2 flex items-center justify-between gap-1">
+    <nav className="border-t p-2 flex items-center justify-between gap-1 fixed bottom-0 w-full bg-background z-10">
       {tabs.map((tab) => (
         <Button
           key={tab.id}

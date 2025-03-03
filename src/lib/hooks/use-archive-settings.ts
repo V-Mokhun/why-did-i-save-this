@@ -1,32 +1,43 @@
 import { useStorage } from "./use-storage";
 import { DEFAULT_ARCHIVE_DAYS } from "../archive";
 
-export const ARCHIVE_DAYS_KEY = "archiveDays";
-export const ARCHIVE_EXCLUDED_CATEGORIES_KEY = "archiveExcludedCategories";
-export const AUTO_ARCHIVE_ENABLED_KEY = "autoArchiveEnabled";
+export const ARCHIVE_SETTINGS_KEY = "archive_settings";
+
+interface ArchiveSettings {
+  archiveDays: number;
+  excludedCategories: string[];
+  autoArchiveEnabled: boolean;
+}
 
 export const useArchiveSettings = () => {
-  const [archiveDays, setArchiveDays] = useStorage<number>(
-    ARCHIVE_DAYS_KEY,
-    DEFAULT_ARCHIVE_DAYS
+  const [settings, setSettings] = useStorage<ArchiveSettings>(
+    ARCHIVE_SETTINGS_KEY,
+    {
+      archiveDays: DEFAULT_ARCHIVE_DAYS,
+      excludedCategories: [],
+      autoArchiveEnabled: true,
+    }
   );
 
-  const [excludedCategories, setExcludedCategories] = useStorage<string[]>(
-    ARCHIVE_EXCLUDED_CATEGORIES_KEY,
-    []
-  );
+  const setArchiveDays = async (days: number) => {
+    setSettings({ ...settings, archiveDays: days });
+  };
 
-  const [autoArchiveEnabled, setAutoArchiveEnabled] = useStorage<boolean>(
-    AUTO_ARCHIVE_ENABLED_KEY,
-    true
-  );
+  const setExcludedCategories = async (categories: string[]) => {
+    setSettings({ ...settings, excludedCategories: categories });
+  };
+
+  const setAutoArchiveEnabled = async (enabled: boolean) => {
+    setSettings({ ...settings, autoArchiveEnabled: enabled });
+  };
 
   return {
-    archiveDays,
+    archiveSettings: settings,
+    archiveDays: settings.archiveDays,
+    excludedCategories: settings.excludedCategories,
+    autoArchiveEnabled: settings.autoArchiveEnabled,
     setArchiveDays,
-    excludedCategories,
     setExcludedCategories,
-    autoArchiveEnabled,
     setAutoArchiveEnabled,
   };
 };

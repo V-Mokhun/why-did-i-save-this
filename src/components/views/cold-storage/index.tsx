@@ -76,7 +76,7 @@ export const ColdStorageView = ({}: ColdStorageViewProps) => {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="p-4 border-b">
+      <div className="p-2 border-b sticky top-0 bg-background z-10 w-full mb-2">
         <h1 className="text-xl font-semibold mb-2">Cold Storage</h1>
         <p className="text-sm text-muted-foreground mb-4">
           Links that haven't been accessed for a while are automatically

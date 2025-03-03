@@ -12,9 +12,9 @@ export const HomeHeader = ({ onSearch, canReorder }: HomeHeaderProps) => {
   const { isReordering, toggleReordering } = useReorder();
 
   return (
-    <div className="sticky top-0 bg-background p-2 space-y-2">
+    <div className="sticky top-0 bg-background p-2 space-y-2 z-10 w-full mb-2 border-b">
       <div className="flex items-center justify-between">
-        <h1 className="text-lg font-semibold">Home</h1>
+        <h1 className="text-xl font-semibold">Home</h1>
         {canReorder && (
           <Button
             variant="ghost"

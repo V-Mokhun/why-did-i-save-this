@@ -1,24 +1,31 @@
-import browser from "webextension-polyfill";
-import { updateBadge } from "@/lib/reminder";
 import { checkLinkShouldBeArchived } from "@/lib/archive";
-import { SavedLink } from "@/lib/types";
 import {
-  ARCHIVE_DAYS_KEY,
-  ARCHIVE_EXCLUDED_CATEGORIES_KEY,
-  AUTO_ARCHIVE_ENABLED_KEY,
+  ARCHIVE_SETTINGS_KEY,
+  DEFAULT_TRASH_RETENTION_DAYS,
   LINKS_KEY,
+  TRASH_SETTINGS_KEY,
 } from "@/lib/hooks";
+import { updateBadge } from "@/lib/reminder";
+import { SavedLink } from "@/lib/types";
+import browser from "webextension-polyfill";
 
 console.log("background script loaded");
 
 interface StorageData {
   links?: SavedLink[];
-  archiveDays?: number;
-  archiveExcludedCategories?: string[];
-  autoArchiveEnabled?: boolean;
   [key: string]: any;
 }
 
+interface TrashSettings {
+  retentionDays: number;
+  autoDeleteEnabled: boolean;
+}
+
+interface ArchiveSettings {
+  archiveDays: number;
+  excludedCategories: string[];
+  autoArchiveEnabled: boolean;
+}
 
 // Auto-archive check function
 async function checkAndArchiveLinks() {
@@ -26,22 +33,26 @@ async function checkAndArchiveLinks() {
     // Get all links and archive settings from storage
     const storageData = (await browser.storage.local.get([
       LINKS_KEY,
-      ARCHIVE_DAYS_KEY,
-      ARCHIVE_EXCLUDED_CATEGORIES_KEY,
-      AUTO_ARCHIVE_ENABLED_KEY,
+      ARCHIVE_SETTINGS_KEY,
     ])) as StorageData;
 
     const links = storageData.links || [];
-    const archiveDays = storageData.archiveDays || 30;
-    const excludedCategories = storageData.archiveExcludedCategories || [];
-    const autoArchiveEnabled = storageData.autoArchiveEnabled !== false; // Default to true
+    const archiveSettings = (storageData[ARCHIVE_SETTINGS_KEY] || {
+      archiveDays: 30,
+      excludedCategories: [],
+      autoArchiveEnabled: true,
+    }) as ArchiveSettings;
 
     // If auto-archive is disabled, skip the process
-    if (!autoArchiveEnabled) return;
+    if (!archiveSettings.autoArchiveEnabled) return;
 
     // Find links that should be archived
     const linksToArchive = links.filter((link) =>
-      checkLinkShouldBeArchived(link, archiveDays, excludedCategories)
+      checkLinkShouldBeArchived(
+        link,
+        archiveSettings.archiveDays,
+        archiveSettings.excludedCategories
+      )
     );
 
     // If there are links to archive, update them
@@ -69,6 +80,42 @@ async function checkAndArchiveLinks() {
   }
 }
 
+// Trash cleanup function
+async function checkAndDeleteOldTrash() {
+  try {
+    const storageData = await browser.storage.local.get([
+      LINKS_KEY,
+      TRASH_SETTINGS_KEY,
+    ]);
+
+    const links = (storageData.links || []) as SavedLink[];
+    const trashSettings = (storageData[TRASH_SETTINGS_KEY] || {
+      retentionDays: DEFAULT_TRASH_RETENTION_DAYS,
+      autoDeleteEnabled: true,
+    }) as TrashSettings;
+
+    if (!trashSettings.autoDeleteEnabled) return;
+
+    const now = new Date();
+    const updatedLinks = links.filter((link: SavedLink) => {
+      if (!link.deletedAt) return true;
+      const deletedDate = new Date(link.deletedAt);
+      const daysInTrash =
+        (now.getTime() - deletedDate.getTime()) / (1000 * 60 * 60 * 24);
+      return daysInTrash < trashSettings.retentionDays;
+    });
+
+    if (updatedLinks.length !== links.length) {
+      await browser.storage.local.set({ links: updatedLinks });
+      console.log(
+        `Deleted ${links.length - updatedLinks.length} old items from trash`
+      );
+    }
+  } catch (error) {
+    console.error("Error in trash cleanup process:", error);
+  }
+}
+
 // Listen for storage changes to update the badge
 browser.storage.onChanged.addListener((changes, areaName) => {
   if (areaName === "local" && changes.links) {
@@ -79,8 +126,13 @@ browser.storage.onChanged.addListener((changes, areaName) => {
 // Update the badge periodically (every hour)
 setInterval(updateBadge, 60 * 60 * 1000);
 
-// Run auto-archive check daily
-setInterval(checkAndArchiveLinks, 24 * 60 * 60 * 1000);
+// Run auto-archive and trash cleanup checks daily
+setInterval(() => {
+  checkAndArchiveLinks();
+  checkAndDeleteOldTrash();
+}, 24 * 60 * 60 * 1000);
 
+// Initial checks
 checkAndArchiveLinks();
+checkAndDeleteOldTrash();
 updateBadge();
