@@ -2,10 +2,13 @@ import { useCallback } from "react";
 import { Category } from "../types";
 import { useStorage } from "./use-storage";
 
-const STORAGE_KEY = "categories";
+export const CATEGORIES_KEY = "categories";
 
 export function useCategories() {
-  const [categories, setCategories] = useStorage<Category[]>(STORAGE_KEY, []);
+  const [categories, setCategories] = useStorage<Category[]>(
+    CATEGORIES_KEY,
+    []
+  );
 
   const saveCategory = useCallback(
     async (category: Category): Promise<Category[]> => {

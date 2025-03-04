@@ -66,7 +66,7 @@ This checklist outlines every step required to build the "Why Did I Save This?" 
 
 ---
 
-## 5. Reminder System Implementation
+## 5. Reminder System Implementation ✅
 - [x] **Define Reminder Logic**
   - [x] Set conditions to flag links not opened within a configurable timeframe (default: 7 days).
 - [x] **UI for Reminders**
@@ -77,42 +77,32 @@ This checklist outlines every step required to build the "Why Did I Save This?" 
 
 ---
 
-## 6. Cold Storage (Auto-Archiving)
-- [ ] **Auto-Archiving Logic**
-  - [ ] Implement functionality to auto-archive links not accessed within a configurable timeframe (default: 30 days).
-- [ ] **Category Exclusions**
-  - [ ] Exclude specific categories (e.g., "Pinned") from auto-archiving.
-- [ ] **Pre-Archive Notifications**
-  - [ ] Provide notifications (e.g., "5 links will be archived tomorrow") in the UI.
-- [ ] **Archived Links View**
-  - [ ] Create a dedicated view in the popup to display archived links.
-  - [ ] Implement functionality to restore archived links to active status.
+## 6. Cold Storage (Auto-Archiving) ✅
+- [x] **Auto-Archiving Logic**
+  - [x] Implement functionality to auto-archive links not accessed within a configurable timeframe (default: 30 days).
+- [x] **Category Exclusions**
+  - [x] Exclude specific categories (e.g., "Pinned") from auto-archiving.
+- [x] **Pre-Archive Notifications**
+  - [x] Provide notifications (e.g., "5 links will be archived tomorrow") in the UI.
+- [x] **Archived Links View**
+  - [x] Create a dedicated view in the popup to display archived links.
+  - [x] Implement functionality to restore archived links to active status.
 
 ---
 
-## 7. Deletion & Undo System
-- [ ] **Deletion Options**
-  - [ ] Implement soft deletion (removing a link from a category).
-  - [ ] Implement full deletion (moving a link to a Trash view).
-- [ ] **Trash Management**
-  - [ ] Create a Trash view to display deleted links.
-  - [ ] Allow users to restore or permanently delete links from Trash.
-- [ ] **Undo Feature**
-  - [ ] After a deletion, display an undo banner with a 15-second reversal option.
+## 7. Deletion & Undo System ✅
+- [x] **Deletion Options**
+  - [x] Implement soft deletion (removing a link from a category).
+  - [x] Implement full deletion (moving a link to a Trash view).
+- [x] **Trash Management**
+  - [x] Create a Trash view to display deleted links.
+  - [x] Allow users to restore or permanently delete links from Trash.
+- [x] **Undo Feature**
+  - [x] After a deletion, display an undo banner with a 15-second reversal option.
 
 ---
 
-## 8. Dark Mode Implementation
-- [ ] **Add Dark Mode Styles in popup.css**
-  - [ ] Define alternative color schemes for backgrounds, text, and elements in dark mode
-- [ ] **Implement Dark Mode Toggle in popup.js**
-  - [ ] Detect system dark mode preferences using media queries or browser APIs
-  - [ ] Add a toggle control in popup.html to switch between dark and light modes
-  - [ ] Persist the user's dark mode preference using local storage
-
----
-
-## 9. Minimal Onboarding Flow
+## 8. Minimal Onboarding Flow
 - [ ] **Onboarding UI in popup.html**
   - [ ] Add an onboarding section with a friendly message ("Save your first link!") and a highlighted action button
 - [ ] **Onboarding Logic in popup.js**
@@ -122,7 +112,7 @@ This checklist outlines every step required to build the "Why Did I Save This?" 
 
 ---
 
-## 10. Backup & Data Export
+## 9. Backup & Data Export
 - [ ] **Backup Functionality**
   - [ ] Develop a function to generate a local backup file in JSON format.
 - [ ] **Export/Import Options**
@@ -133,7 +123,7 @@ This checklist outlines every step required to build the "Why Did I Save This?" 
 
 ---
 
-## 11. Integration, Error Handling & Testing
+## 10. Integration, Error Handling & Testing
 - [ ] **Module Integration**
   - [ ] Wire together all modules: popup UI, link saving, categorization, reminders, cold storage, deletion/undo, and backup.
 - [ ] **Error Handling**

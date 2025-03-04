@@ -128,7 +128,6 @@ This document outlines the complete UI flow for the extension, detailing each vi
       - **Import/Export:** Buttons for JSON-based data import/export.
       - **Backup:** Option to generate and store a local backup file.
     - **UI/UX Preferences:**
-      - Toggle for Dark Mode.
       - Shortcut remapping interface to change the default keyboard shortcut.
 - **Navigation:**  
   - The Bottom Tab Bar highlights the Options tab.
