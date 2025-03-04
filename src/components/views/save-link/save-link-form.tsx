@@ -73,9 +73,11 @@ export function SaveLinkForm({
       };
 
       await onSave(linkData);
-      setNote("");
-      setSelectedCategories([]);
-      setEditedReminderDays(reminderDays || undefined);
+      setTimeout(() => {
+        setNote("");
+        setSelectedCategories([]);
+        setEditedReminderDays(reminderDays || undefined);
+      }, 100);
     } catch (error) {
       toast.error("Invalid URL", {
         description:
@@ -158,7 +160,13 @@ export function SaveLinkForm({
           placeholder="Why are you saving this?"
           value={note}
           onChange={(e) => setNote(e.target.value)}
-          className="min-h-20 resize-none"
+          className="h-20 resize-none overflow-y-auto"
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              handleSubmit(e as React.FormEvent);
+            }
+          }}
           maxLength={100}
           required
         />

@@ -3,6 +3,7 @@
 This checklist outlines every step required to build the "Why Did I Save This?" browser extension. Use it to track progress as you implement each feature.
 
 ## 1. Project Setup & Environment ✅
+
 - [x] **Repository & Structure**
   - [x] Create a new project repository.
   - [x] Set up a basic directory structure:
@@ -21,6 +22,7 @@ This checklist outlines every step required to build the "Why Did I Save This?" 
 ---
 
 ## 2. Basic Popup UI Implementation ✅
+
 - [x] **Popup Implementation**
   - [x] Create Popup component with header
   - [x] Add an input field (textarea) for the note
@@ -35,6 +37,7 @@ This checklist outlines every step required to build the "Why Did I Save This?" 
 ---
 
 ## 3. Core Link Saving Functionality ✅
+
 - [x] **Capture Active Tab Data**
   - [x] Use WebExtension API (with polyfill) to capture the active tab's URL and title.
 - [x] **Extend Popup UI**
@@ -53,6 +56,7 @@ This checklist outlines every step required to build the "Why Did I Save This?" 
 ---
 
 ## 4. Categorization & Organization ✅
+
 - [x] **UI Enhancements**
   - [x] Update `popup.tsx` to allow users to create new categories.
   - [x] Enable assigning colors/icons (including emoji support) to categories.
@@ -67,6 +71,7 @@ This checklist outlines every step required to build the "Why Did I Save This?" 
 ---
 
 ## 5. Reminder System Implementation ✅
+
 - [x] **Define Reminder Logic**
   - [x] Set conditions to flag links not opened within a configurable timeframe (default: 7 days).
 - [x] **UI for Reminders**
@@ -78,6 +83,7 @@ This checklist outlines every step required to build the "Why Did I Save This?" 
 ---
 
 ## 6. Cold Storage (Auto-Archiving) ✅
+
 - [x] **Auto-Archiving Logic**
   - [x] Implement functionality to auto-archive links not accessed within a configurable timeframe (default: 30 days).
 - [x] **Category Exclusions**
@@ -91,6 +97,7 @@ This checklist outlines every step required to build the "Why Did I Save This?" 
 ---
 
 ## 7. Deletion & Undo System ✅
+
 - [x] **Deletion Options**
   - [x] Implement soft deletion (removing a link from a category).
   - [x] Implement full deletion (moving a link to a Trash view).
@@ -102,43 +109,31 @@ This checklist outlines every step required to build the "Why Did I Save This?" 
 
 ---
 
-## 8. Minimal Onboarding Flow
-- [ ] **Onboarding UI in popup.html**
-  - [ ] Add an onboarding section with a friendly message ("Save your first link!") and a highlighted action button
-- [ ] **Onboarding Logic in popup.js**
-  - [ ] Check via local storage whether the user is new to the extension
-  - [ ] Display the onboarding message if the user has not saved any links yet
-  - [ ] Automatically hide the onboarding message once the first link is saved
+## 8. Minimal Onboarding Flow ✅
+
+- [x] **Onboarding UI in popup.html**
+  - [x] Add an onboarding section with a friendly message ("Save your first link!") and a highlighted action button
+- [x] **Onboarding Logic in popup.js**
+  - [x] Check via local storage whether the user is new to the extension
+  - [x] Display the onboarding message if the user has not saved any links yet
+  - [x] Automatically hide the onboarding message once the first link is saved
 
 ---
 
-## 9. Backup & Data Export
-- [ ] **Backup Functionality**
-  - [ ] Develop a function to generate a local backup file in JSON format.
-- [ ] **Export/Import Options**
-  - [ ] Add UI options for exporting saved data as JSON.
-  - [ ] Implement functionality for importing JSON data.
-- [ ] **User Feedback**
-  - [ ] Provide clear notifications upon successful backup, export, or import actions.
+## 9. Backup & Data Export ✅
 
----
-
-## 10. Integration, Error Handling & Testing
-- [ ] **Module Integration**
-  - [ ] Wire together all modules: popup UI, link saving, categorization, reminders, cold storage, deletion/undo, and backup.
-- [ ] **Error Handling**
-  - [ ] Implement error handling for storage operations and duplicate detection.
-  - [ ] Display clear, actionable error messages to users.
-- [ ] **Testing Setup**
-  - [ ] Set up unit tests for core functionalities (e.g., link saving, duplicate detection, reminder triggering).
-  - [ ] Set up integration tests simulating complete user workflows.
-  - [ ] Conduct cross-browser testing using webextension-polyfill.
-- [ ] **Documentation**
-  - [ ] Add comprehensive code comments and documentation for maintainability.
+- [x] **Backup Functionality**
+  - [x] Develop a function to generate a local backup file in JSON format.
+- [x] **Export/Import Options**
+  - [x] Add UI options for exporting saved data as JSON.
+  - [x] Implement functionality for importing JSON data.
+- [x] **User Feedback**
+  - [x] Provide clear notifications upon successful backup, export, or import actions.
 
 ---
 
 ## Final Steps
+
 - [ ] **Beta Release**
   - [ ] Conduct internal testing.
   - [ ] Prepare for a public beta release for user feedback.

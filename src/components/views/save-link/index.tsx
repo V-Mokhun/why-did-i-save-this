@@ -1,6 +1,6 @@
 import { ConfirmDialog } from "@/components/dialogs/confirm-dialog";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { useCurrentTab, useLinks } from "@/lib/hooks";
+import { useCurrentTab, useLinks, useOnboarding } from "@/lib/hooks";
 import { SavedLink } from "@/lib/types";
 import { useRef, useState } from "react";
 import { SaveLinkForm } from "./save-link-form";
@@ -19,6 +19,7 @@ export const SaveLinkView = ({
   const currentTab = useCurrentTab();
   const [showConfirm, setShowConfirm] = useState(false);
   const { saveLink, updateLink } = useLinks();
+  const { markOnboardingAsSeen } = useOnboarding();
   const onConfirm = useRef<Function>(null);
 
   const handleSave = async (link: SavedLink) => {
@@ -27,7 +28,6 @@ export const SaveLinkView = ({
       if (result) {
         setIsOpen(false);
       }
-
       return;
     }
 
@@ -38,6 +38,7 @@ export const SaveLinkView = ({
     if (typeof result === "function") {
       onConfirm.current = result;
     } else {
+      markOnboardingAsSeen();
       setIsOpen(false);
     }
   };
@@ -45,8 +46,8 @@ export const SaveLinkView = ({
   const handleConfirm = () => {
     if (onConfirm.current) {
       onConfirm.current();
+      markOnboardingAsSeen();
     }
-
     setShowConfirm(false);
     setIsOpen(false);
   };

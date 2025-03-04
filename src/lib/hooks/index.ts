@@ -6,3 +6,4 @@ export * from "./use-reorder";
 export * from "./use-reminder";
 export * from "./use-archive-settings";
 export * from "./use-trash-settings";
+export * from "./use-onboarding";
