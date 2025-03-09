@@ -9,8 +9,6 @@ import { updateBadge } from "@/lib/reminder";
 import { SavedLink } from "@/lib/types";
 import browser from "webextension-polyfill";
 
-console.log("background script loaded");
-
 interface StorageData {
   links?: SavedLink[];
   [key: string]: any;
