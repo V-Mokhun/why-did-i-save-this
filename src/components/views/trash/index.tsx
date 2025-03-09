@@ -1,21 +1,23 @@
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { useLinks, useCategories } from "@/lib/hooks";
-import { toast } from "sonner";
-import { TrashedLinkItem } from "./trashed-link-item";
-import { TrashHeader } from "./trash-header";
-import { Input } from "@/components/ui/input";
-import { Search, AlertCircle } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useState, useMemo } from "react";
 import { CategoryChips } from "@/components/category-chips";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useCategories, useLinks, useTrashSettings } from "@/lib/hooks";
+import { useMemo, useState } from "react";
+import { toast } from "sonner";
+import { TrashHeader } from "./trash-header";
+import { TrashedLinkItem } from "./trashed-link-item";
+import { Trash2 } from "lucide-react";
 
-const PERMANENT_DELETE_DAYS = 30; // Configure as needed
+interface TrashViewProps {
+  onViewChange?: (view: "settings") => void;
+}
 
-export const TrashView = () => {
+export const TrashView = ({ onViewChange }: TrashViewProps) => {
   const { trashedLinks, restoreFromTrash, deleteLink, emptyTrash } = useLinks();
   const { categories } = useCategories();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const { retentionDays, autoDeleteEnabled } = useTrashSettings();
 
   // Get only categories that are used in trashed links
   const availableCategories = useMemo(() => {
@@ -49,7 +51,6 @@ export const TrashView = () => {
   };
 
   const filteredLinks = trashedLinks.filter((link) => {
-    // Search filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       const matchesSearch =
@@ -59,7 +60,6 @@ export const TrashView = () => {
       if (!matchesSearch) return false;
     }
 
-    // Category filter
     if (selectedCategories.length > 0) {
       const hasSelectedCategory = selectedCategories.some((categoryId) =>
         link.categories?.includes(categoryId)
@@ -71,46 +71,37 @@ export const TrashView = () => {
   });
 
   return (
-    <div className="flex flex-col h-full px-2">
+    <div className="flex flex-col h-full">
       <TrashHeader
+        onSearch={setSearchQuery}
+        searchQuery={searchQuery}
         hasItems={trashedLinks.length > 0}
         onEmptyTrash={handleEmptyTrash}
+        onViewChange={onViewChange}
       />
-      <Alert variant="destructive" className="mb-2">
-        <AlertCircle className="h-4 w-4" />
-        <AlertDescription>
-          Items in trash will be permanently deleted after{" "}
-          {PERMANENT_DELETE_DAYS} days
-        </AlertDescription>
-      </Alert>
-      {trashedLinks.length > 0 && (
-        <>
-          <div className="relative mb-2">
-            <Search className="absolute left-4 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search in trash..."
-              className="pl-10"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-          {availableCategories.length > 0 && (
-            <CategoryChips
-              categories={availableCategories}
-              selectedCategories={selectedCategories}
-              onCategoryToggle={handleCategoryToggle}
-              showAddCategory={false}
-              wrapperClassName="p-0"
-            />
-          )}
-        </>
+
+      {availableCategories.length > 0 && (
+        <CategoryChips
+          categories={availableCategories}
+          selectedCategories={selectedCategories}
+          onCategoryToggle={handleCategoryToggle}
+        />
       )}
+
       {filteredLinks.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-full text-sm text-muted-foreground">
-          <p>
+        <div className="flex flex-col items-center justify-center flex-1 p-8 text-center">
+          <div className="bg-muted rounded-full p-3 mb-4">
+            <Trash2 className="h-6 w-6 text-muted-foreground" />
+          </div>
+          <h3 className="font-medium mb-1">
             {searchQuery || selectedCategories.length > 0
               ? "No matching items found"
               : "Trash is empty"}
+          </h3>
+          <p className="text-sm text-muted-foreground max-w-md">
+            {autoDeleteEnabled
+              ? `Links that haven't been accessed for ${retentionDays} days will automatically be moved here.`
+              : "Enable auto-deleting in settings to automatically move inactive links here."}
           </p>
         </div>
       ) : (
@@ -121,8 +112,8 @@ export const TrashView = () => {
                 key={link.url}
                 link={link}
                 categories={categories}
-                onRestore={handleRestore}
-                onDelete={handleDelete}
+                onRestore={() => handleRestore(link.url)}
+                onDelete={() => handleDelete(link.url)}
               />
             ))}
           </div>

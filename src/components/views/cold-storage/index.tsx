@@ -1,23 +1,26 @@
-import { useState } from "react";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Input } from "@/components/ui/input";
-import { ArchiveRestore, Trash2, ExternalLink } from "lucide-react";
-import { useCategories, useLinks } from "@/lib/hooks";
-import { toast } from "sonner";
-import browser from "webextension-polyfill";
-import { LinkCard } from "@/components/shared/link-card";
-import { LinkActions, LinkAction } from "@/components/shared/link-actions";
-import { SavedLink } from "@/lib/types";
-import { formatRelativeTime } from "@/lib/date";
 import { PreArchiveNotification } from "@/components/pre-archive-notification";
+import { LinkAction } from "@/components/shared/link-actions";
+import { LinkCard } from "@/components/shared/link-card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { formatRelativeTime } from "@/lib/date";
+import { useArchiveSettings, useCategories, useLinks } from "@/lib/hooks";
+import { SavedLink } from "@/lib/types";
+import { ArchiveRestore, ExternalLink, Settings, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 
-interface ColdStorageViewProps {}
+interface ColdStorageViewProps {
+  onViewChange?: (view: "settings") => void;
+}
 
-export const ColdStorageView = ({}: ColdStorageViewProps) => {
+export const ColdStorageView = ({ onViewChange }: ColdStorageViewProps) => {
   const { archivedLinks, restoreFromArchive, moveToTrash, updateLink } =
     useLinks();
   const { categories } = useCategories();
+  const { autoArchiveEnabled, archiveDays } = useArchiveSettings();
   const [searchQuery, setSearchQuery] = useState("");
 
   const handleRestore = async (link: SavedLink) => {
@@ -77,10 +80,26 @@ export const ColdStorageView = ({}: ColdStorageViewProps) => {
     <div className="flex flex-col h-full">
       <div className="p-2 border-b sticky top-0 bg-background z-10 w-full mb-2">
         <h1 className="text-xl font-semibold mb-2">Cold Storage</h1>
-        <p className="text-sm text-muted-foreground mb-4">
-          Links that haven't been accessed for a while are automatically
-          archived here.
-        </p>
+        {autoArchiveEnabled ? (
+          <p className="text-sm text-muted-foreground mb-2">
+            Links that haven't been accessed for {archiveDays} days are
+            automatically archived here.
+          </p>
+        ) : (
+          <Alert className="mb-2">
+            <AlertDescription className="flex items-center justify-between">
+              <span>Auto-archiving is currently disabled.</span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onViewChange?.("settings")}
+              >
+                <Settings className="mr-2 h-4 w-4" />
+                Configure
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
         <Input
           placeholder="Search archived links..."
           value={searchQuery}
@@ -98,8 +117,9 @@ export const ColdStorageView = ({}: ColdStorageViewProps) => {
           </div>
           <h3 className="font-medium mb-1">No archived links</h3>
           <p className="text-sm text-muted-foreground max-w-md">
-            Links that haven't been accessed for a while will automatically be
-            moved here.
+            {autoArchiveEnabled
+              ? `Links that haven't been accessed for ${archiveDays} days will automatically be moved here.`
+              : "Enable auto-archiving in settings to automatically move inactive links here."}
           </p>
         </div>
       ) : (

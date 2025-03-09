@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
-import browser from "webextension-polyfill";
 import { SavedLink } from "@/lib/types";
+import browser from "webextension-polyfill";
 import { LINKS_KEY } from "./use-links";
+import { useStorage } from "./use-storage";
 
 export const TRASH_SETTINGS_KEY = "trash_settings";
 export const DEFAULT_TRASH_RETENTION_DAYS = 7;
@@ -12,24 +12,15 @@ interface TrashSettings {
 }
 
 export const useTrashSettings = () => {
-  const [settings, setSettings] = useState<TrashSettings>({
-    retentionDays: DEFAULT_TRASH_RETENTION_DAYS,
-    autoDeleteEnabled: true,
-  });
-
-  useEffect(() => {
-    loadSettings();
-  }, []);
-
-  const loadSettings = async () => {
-    const result = await browser.storage.local.get(TRASH_SETTINGS_KEY);
-    if (result[TRASH_SETTINGS_KEY]) {
-      setSettings(result[TRASH_SETTINGS_KEY] as TrashSettings);
+  const [settings, setSettings] = useStorage<TrashSettings>(
+    TRASH_SETTINGS_KEY,
+    {
+      retentionDays: DEFAULT_TRASH_RETENTION_DAYS,
+      autoDeleteEnabled: true,
     }
-  };
+  );
 
   const saveSettings = async (newSettings: TrashSettings) => {
-    await browser.storage.local.set({ [TRASH_SETTINGS_KEY]: newSettings });
     setSettings(newSettings);
   };
 

@@ -20,9 +20,9 @@ export default function Popup() {
       case "home":
         return <HomeView />;
       case "cold-storage":
-        return <ColdStorageView />;
+        return <ColdStorageView onViewChange={setCurrentView} />;
       case "trash":
-        return <TrashView />;
+        return <TrashView onViewChange={setCurrentView} />;
       case "settings":
         return <SettingsView />;
       default:

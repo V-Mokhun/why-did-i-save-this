@@ -1,15 +1,15 @@
+import { LinkAction } from "@/components/shared/link-actions";
+import { LinkCard } from "@/components/shared/link-card";
 import { Button } from "@/components/ui/button";
 import { Category, SavedLink } from "@/lib/types";
-import { Undo2, Trash2, ExternalLink } from "lucide-react";
+import { ExternalLink, Trash2, Undo2 } from "lucide-react";
 import browser from "webextension-polyfill";
-import { LinkCard } from "@/components/shared/link-card";
-import { LinkActions, LinkAction } from "@/components/shared/link-actions";
 
 interface TrashedLinkItemProps {
   link: SavedLink;
   categories: Category[];
-  onRestore: (url: string) => Promise<void>;
-  onDelete: (url: string) => Promise<void>;
+  onRestore: () => Promise<void>;
+  onDelete: () => Promise<void>;
 }
 
 export const TrashedLinkItem = ({
@@ -26,7 +26,7 @@ export const TrashedLinkItem = ({
     {
       label: "Restore",
       icon: <Undo2 className="mr-2 h-4 w-4" />,
-      onClick: () => onRestore(link.url),
+      onClick: () => onRestore(),
     },
     {
       label: "Open link",
@@ -36,7 +36,7 @@ export const TrashedLinkItem = ({
     {
       label: "Delete permanently",
       icon: <Trash2 className="mr-2 h-4 w-4" />,
-      onClick: () => onDelete(link.url),
+      onClick: () => onDelete(),
       className: "text-destructive",
     },
   ];
