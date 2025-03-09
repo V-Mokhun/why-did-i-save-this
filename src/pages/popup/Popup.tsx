@@ -7,27 +7,12 @@ import {
   TrashView,
 } from "@/components/views";
 import { View } from "@/lib/types";
-import { useEffect, useState } from "react";
-import browser from "webextension-polyfill";
+import { useState } from "react";
 import { PopupNavigation } from "./components/popup-navigation";
 
 export default function Popup() {
   const [currentView, setCurrentView] = useState<View>("home");
   const [isSaveLinkDialogOpen, setIsSaveLinkDialogOpen] = useState(false);
-
-  useEffect(() => {
-    const checkShouldOpenSaveLink = async () => {
-      const shouldOpenSaveLink = await browser.storage.local.get(
-        "shouldOpenSaveLink"
-      );
-      if (shouldOpenSaveLink) {
-        setIsSaveLinkDialogOpen(true);
-        await browser.storage.local.remove("shouldOpenSaveLink");
-      }
-    };
-
-    checkShouldOpenSaveLink();
-  }, []);
 
   const renderCurrentView = () => {
     switch (currentView) {

@@ -134,11 +134,3 @@ setInterval(() => {
 checkAndArchiveLinks();
 checkAndDeleteOldTrash();
 updateBadge();
-
-// Handle keyboard shortcut
-browser.commands.onCommand.addListener(async (command) => {
-  if (command === "open-save-link-modal") {
-    await browser.storage.local.set({ shouldOpenSaveLink: true });
-    await browser.action.openPopup();
-  }
-});
