@@ -1,8 +1,4 @@
 import { Toaster } from "@/components/ui/sonner";
-import { PopupHeader } from "./components/popup-header";
-import { PopupNavigation } from "./components/popup-navigation";
-import { View } from "@/lib/types";
-import { useState } from "react";
 import {
   ColdStorageView,
   HomeView,
@@ -10,10 +6,28 @@ import {
   SettingsView,
   TrashView,
 } from "@/components/views";
+import { View } from "@/lib/types";
+import { useEffect, useState } from "react";
+import browser from "webextension-polyfill";
+import { PopupNavigation } from "./components/popup-navigation";
 
 export default function Popup() {
   const [currentView, setCurrentView] = useState<View>("home");
   const [isSaveLinkDialogOpen, setIsSaveLinkDialogOpen] = useState(false);
+
+  useEffect(() => {
+    const checkShouldOpenSaveLink = async () => {
+      const shouldOpenSaveLink = await browser.storage.local.get(
+        "shouldOpenSaveLink"
+      );
+      if (shouldOpenSaveLink) {
+        setIsSaveLinkDialogOpen(true);
+        await browser.storage.local.remove("shouldOpenSaveLink");
+      }
+    };
+
+    checkShouldOpenSaveLink();
+  }, []);
 
   const renderCurrentView = () => {
     switch (currentView) {
@@ -29,6 +43,7 @@ export default function Popup() {
         return <HomeView />;
     }
   };
+
   return (
     <div className="flex flex-col h-[600px] w-md">
       {/* <PopupHeader /> */}

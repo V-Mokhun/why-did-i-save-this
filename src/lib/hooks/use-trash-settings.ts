@@ -36,7 +36,7 @@ export const useTrashSettings = () => {
     if (!settings.autoDeleteEnabled) return;
 
     const result = await browser.storage.local.get(LINKS_KEY);
-    const links = (result.links || []) as SavedLink[];
+    const links = (result[LINKS_KEY] || []) as SavedLink[];
     const now = new Date();
 
     const updatedLinks = links.filter((link) => {
@@ -47,7 +47,7 @@ export const useTrashSettings = () => {
       return daysInTrash < settings.retentionDays;
     });
 
-    await browser.storage.local.set({ links: updatedLinks });
+    await browser.storage.local.set({ [LINKS_KEY]: updatedLinks });
   };
 
   return {

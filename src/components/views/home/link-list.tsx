@@ -23,6 +23,7 @@ import {
   sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable";
 import { SortableLink } from "./sortable-link";
+import { checkLinkNeedsAttention } from "@/lib/reminder";
 
 interface LinkListProps {
   links: SavedLink[];
@@ -103,23 +104,12 @@ export const LinkList = ({
           break;
         case "recent":
           if (!link.lastOpenedAt) return false;
-          //TODO: Make this configurable
+
           const oneWeekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
           if (link.lastOpenedAt < oneWeekAgo) return false;
           break;
         case "needs-attention":
-          if (!link.reminderDays) return false;
-
-          const reminderThreshold =
-            Date.now() - link.reminderDays * 24 * 60 * 60 * 1000;
-
-          if (
-            (link.lastOpenedAt && link.lastOpenedAt < reminderThreshold) ||
-            (!link.lastOpenedAt && Date.now() > reminderThreshold)
-          ) {
-            return true;
-          }
-          return false;
+          return checkLinkNeedsAttention(link);
       }
     }
 

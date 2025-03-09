@@ -70,7 +70,7 @@ async function checkAndArchiveLinks() {
       });
 
       // Save the updated links
-      await browser.storage.local.set({ links: updatedLinks });
+      await browser.storage.local.set({ [LINKS_KEY]: updatedLinks });
 
       // Log the number of archived links
       console.log(`Auto-archived ${linksToArchive.length} links`);
@@ -106,7 +106,7 @@ async function checkAndDeleteOldTrash() {
     });
 
     if (updatedLinks.length !== links.length) {
-      await browser.storage.local.set({ links: updatedLinks });
+      await browser.storage.local.set({ [LINKS_KEY]: updatedLinks });
       console.log(
         `Deleted ${links.length - updatedLinks.length} old items from trash`
       );
@@ -136,3 +136,11 @@ setInterval(() => {
 checkAndArchiveLinks();
 checkAndDeleteOldTrash();
 updateBadge();
+
+// Handle keyboard shortcut
+browser.commands.onCommand.addListener(async (command) => {
+  if (command === "open-save-link-modal") {
+    await browser.storage.local.set({ shouldOpenSaveLink: true });
+    await browser.action.openPopup();
+  }
+});

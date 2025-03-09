@@ -27,12 +27,12 @@
     }
   ],
   "commands": {
-    "_execute_action": {
+    "open-save-link-modal": {
       "suggested_key": {
         "default": "Ctrl+Shift+S",
         "mac": "MacCtrl+Shift+S"
       },
-      "description": "Open The Extension"
+      "description": "Open The Extension to save a link"
     }
   },
   "web_accessible_resources": [
